@@ -85,6 +85,6 @@ if __name__ == "__main__":
     
     listenWS(wsFactory, contextFactory)
 
-    reactor.listenSSl(9090,site,contextFactory)
+    reactor.listenSSL(9090,site,contextFactory)
     #reactor.listenTCP(9090, site)
     reactor.run()
