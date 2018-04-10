@@ -27,7 +27,7 @@ class EchoServerProtocol(WebSocketServerProtocol):
 
 class HelloWorld(restful.Resource):
     def get(self,todo_id):
-        return {'hello': '%s'%todo_id}        
+        return {'hello': todo_id}        
 
 
 # Our WSGI application .. in this case Flask based
@@ -46,7 +46,7 @@ def page_home():
 def hello():
     return 'Hello, World!'
 
-api.add_resource(HelloWorld, '/hello')
+api.add_resource(HelloWorld, '/<string:todo_id>')
 
 
 if __name__ == "__main__":
