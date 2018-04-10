@@ -86,6 +86,6 @@ if __name__ == "__main__":
     site = Site(rootResource)
     
 
-    reactor.listenSSL(9090,site,contextFactory)
-    #reactor.listenTCP(9090, site)
+    # reactor.listenSSL(9090,site,contextFactory)
+    reactor.listenTCP(9090, site)
     reactor.run()
