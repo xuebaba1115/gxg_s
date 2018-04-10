@@ -69,6 +69,12 @@ if __name__ == "__main__":
 
     # create a Twisted Web resource for our WebSocket server
     wsFactory = WebSocketServerFactory(u"wss://127.0.0.1:9090")
+    wsFactory.setProtocolOptions(
+        allowedOrigins=[
+            "https://127.0.0.1:9090",
+            "https://localhost:9090",
+        ]
+    )
     wsFactory.protocol = EchoServerProtocol
     wsResource = WebSocketResource(wsFactory)
 
