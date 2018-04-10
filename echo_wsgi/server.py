@@ -7,6 +7,7 @@ from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
 
 from flask import Flask, render_template
+from flask_cache import Cache
 from flask.ext.restful import Resource, Api
 
 from autobahn.twisted.websocket import WebSocketServerFactory, \
