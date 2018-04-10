@@ -7,7 +7,7 @@ from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
 
 from flask_cache import Cache
-from flask import Flask, render_template
+from flask import Flask, render_template,abort, request, jsonify, g, url_for
 from flask.ext import restful
 
 from autobahn.twisted.websocket import WebSocketServerFactory, \
@@ -45,6 +45,17 @@ def page_home():
 @app.route('/login')
 def hello():
     return 'Hello, World!'
+
+@app.route('/api/users', methods = ['POST'])
+def new_user():
+    username = request.json.get('username')
+    password = request.json.get('password')
+    if username is None or password is None:
+        abort(400) # missing arguments
+
+    return jsonify({ 'username': username }),201
+
+
 
 api.add_resource(HelloWorld, '/<string:todo_id>')
 
