@@ -69,7 +69,7 @@ if __name__ == "__main__":
                                                       'keys/server.crt')
 
     # create a Twisted Web resource for our WebSocket server
-    wsFactory = WebSocketServerFactory(u"wss://127.0.0.1:9090")
+    wsFactory = WebSocketServerFactory(u"wss://127.0.0.1:9000")
     wsFactory.protocol = EchoServerProtocol
     wsResource = WebSocketResource(wsFactory)
 
@@ -79,7 +79,8 @@ if __name__ == "__main__":
     # create a root resource serving everything via WSGI/Flask, but
     # the path "/ws" served by our WebSocket stuff
     rootResource = WSGIRootResource(wsgiResource, {b'ws': wsResource})
-    
+
+    listenWS(wsFactory, contextFactory)
     
 
     # create a Twisted Web Site and run everything
