@@ -6,6 +6,7 @@ from twisted.internet import reactor,ssl
 from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
 
+
 from flask_cache import Cache
 from flask import Flask, render_template,abort, request, jsonify, g, url_for
 from flask.ext import restful
@@ -69,12 +70,6 @@ if __name__ == "__main__":
 
     # create a Twisted Web resource for our WebSocket server
     wsFactory = WebSocketServerFactory(u"wss://127.0.0.1:9090")
-    wsFactory.setProtocolOptions(
-        allowedOrigins=[
-            "https://127.0.0.1:9090",
-            "https://localhost:9090",
-        ]
-    )
     wsFactory.protocol = EchoServerProtocol
     wsResource = WebSocketResource(wsFactory)
 
@@ -84,6 +79,7 @@ if __name__ == "__main__":
     # create a root resource serving everything via WSGI/Flask, but
     # the path "/ws" served by our WebSocket stuff
     rootResource = WSGIRootResource(wsgiResource, {b'ws': wsResource})
+    
     
 
     # create a Twisted Web Site and run everything
