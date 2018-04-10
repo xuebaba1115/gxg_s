@@ -2,7 +2,7 @@ import uuid
 import sys
 
 from twisted.python import log
-from twisted.internet import reactor
+from twisted.internet import reactor.ssl
 from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
 
@@ -11,7 +11,7 @@ from flask import Flask, render_template,abort, request, jsonify, g, url_for
 from flask.ext import restful
 
 from autobahn.twisted.websocket import WebSocketServerFactory, \
-    WebSocketServerProtocol
+    WebSocketServerProtocol,listenWS
 
 from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
 
@@ -64,6 +64,9 @@ if __name__ == "__main__":
 
     log.startLogging(sys.stdout)
 
+    contextFactory = ssl.DefaultOpenSSLContextFactory('keys/server.key',
+                                                      'keys/server.crt')
+
     # create a Twisted Web resource for our WebSocket server
     wsFactory = WebSocketServerFactory(u"wss://127.0.0.1:9090")
     wsFactory.protocol = EchoServerProtocol
@@ -75,9 +78,13 @@ if __name__ == "__main__":
     # create a root resource serving everything via WSGI/Flask, but
     # the path "/ws" served by our WebSocket stuff
     rootResource = WSGIRootResource(wsgiResource, {b'ws': wsResource})
+    
 
     # create a Twisted Web Site and run everything
     site = Site(rootResource)
+    
+    listenWS(wsFactory, contextFactory)
 
-    reactor.listenTCP(9090, site)
+    reactor.listenSSl(9090,site,contextFactory)
+    #reactor.listenTCP(9090, site)
     reactor.run()
