@@ -25,9 +25,15 @@ class EchoServerProtocol(WebSocketServerProtocol):
         self.sendMessage(payload, isBinary)
 
 
+class HelloWorld(restful.Resource):
+    def get(self):
+        return {'hello': 'world'}        
+
+
 # Our WSGI application .. in this case Flask based
 app = Flask(__name__)
 cache = Cache(app)
+api = restful.Api(app)
 app.secret_key = str(uuid.uuid4())
 
 
@@ -39,6 +45,8 @@ def page_home():
 @app.route('/login')
 def hello():
     return 'Hello, World!'
+
+api.add_resource(HelloWorld, '/hello')
 
 
 if __name__ == "__main__":
