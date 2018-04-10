@@ -7,6 +7,7 @@ from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
 
 from flask import Flask, render_template
+from flask.ext.restful import Resource, Api
 
 from autobahn.twisted.websocket import WebSocketServerFactory, \
     WebSocketServerProtocol
@@ -25,10 +26,12 @@ class EchoServerProtocol(WebSocketServerProtocol):
 
 # Our WSGI application .. in this case Flask based
 app = Flask(__name__)
+cache = Cache(app)
 app.secret_key = str(uuid.uuid4())
 
 
 @app.route('/')
+@cache.cached(timeout=60)
 def page_home():
     return render_template('index.html')
 
