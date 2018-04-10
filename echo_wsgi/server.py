@@ -83,7 +83,6 @@ if __name__ == "__main__":
     # create a Twisted Web Site and run everything
     site = Site(rootResource)
     
-    listenWS(wsFactory, contextFactory)
 
     reactor.listenSSL(9090,site,contextFactory)
     #reactor.listenTCP(9090, site)
