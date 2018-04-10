@@ -65,7 +65,7 @@ if __name__ == "__main__":
     log.startLogging(sys.stdout)
 
     # create a Twisted Web resource for our WebSocket server
-    wsFactory = WebSocketServerFactory(u"ws://127.0.0.1:8080")
+    wsFactory = WebSocketServerFactory(u"ws://127.0.0.1:9090")
     wsFactory.protocol = EchoServerProtocol
     wsResource = WebSocketResource(wsFactory)
 
