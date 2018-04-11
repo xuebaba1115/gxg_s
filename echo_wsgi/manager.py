@@ -10,8 +10,8 @@ class ConnectionManager:
         """初始化
         @param _connections: dict {connID:conn Object}
         """
+        print "################"
         self._connections = {}
-        self._connections.items
 
     def getNowConnCnt(self):
         """获取当前连接数量"""
