@@ -1,5 +1,5 @@
 import uuid
-import sys,os
+import sys
 
 from twisted.python import log
 from twisted.internet import reactor,ssl
@@ -10,9 +10,6 @@ from twisted.web.wsgi import WSGIResource
 from flask_cache import Cache
 from flask import Flask, render_template,abort, request, jsonify, g, url_for
 from flask.ext import restful
-from flask_sqlalchemy import SQLAlchemy
-from flask_httpauth import HTTPBasicAuth
-
 
 from autobahn.twisted.websocket import WebSocketServerFactory, \
     WebSocketServerProtocol,listenWS
@@ -49,23 +46,6 @@ cache = Cache(app)
 api = restful.Api(app)
 app.secret_key = str(uuid.uuid4())
 
-#config
-app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
-app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
-
-# extensions
-db = SQLAlchemy(app)
-auth = HTTPBasicAuth()
-
-
-class User(db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key = True)
-    username = db.Column(db.String(32), index = True)
-    password_hash = db.Column(db.String(128))
-
-
 
 @app.route('/')
 @cache.cached(timeout=60)
@@ -82,21 +62,15 @@ def new_user():
     password = request.json.get('password')
     if username is None or password is None:
         abort(400) # missing arguments
-    if User.query.filter_by(username = username).first() is not None:
-        abort(400) # existing user
-    user = User(username = username)
-    user.hash_password(password)
-    db.session.add(user)
-    db.session.commit()
-    return jsonify({ 'username': user.username }), 201, {'Location': url_for('get_user', id = user.id, _external = True)}
+
+    return jsonify({ 'username': username }),201
+
 
 
 api.add_resource(HelloWorld, '/<string:todo_id>')
 
 
 if __name__ == "__main__":
-    if not os.path.exists('db.sqlite'):
-        db.create_all()
 
     log.startLogging(sys.stdout)
 
