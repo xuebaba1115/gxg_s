@@ -122,6 +122,12 @@ def new_user():
     db.session.commit()
     return jsonify({ 'username': user.username })
 
+@app.route('/api/users/<int:id>')
+def get_user(id):
+    user = User.query.get(id)
+    if not user:
+        abort(400)
+    return jsonify({'username': user.username})
 
 @app.route('/api/resource')
 @auth.login_required
