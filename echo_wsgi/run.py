@@ -24,7 +24,6 @@ from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
 # Our WSGI application .. in this case Flask based
 app = Flask(__name__)
 from views import *
-cache = Cache(app)
 db = SQLAlchemy(app)
 auth = HTTPBasicAuth()
 app.secret_key = str(uuid.uuid4())

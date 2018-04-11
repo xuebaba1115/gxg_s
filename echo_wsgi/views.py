@@ -1,12 +1,11 @@
 import uuid
 import sys,os
 
-from run import app,cache
+from run import app
 from models import User,db,auth
 
 
 from flask import Flask, render_template,abort, request, jsonify, g, url_for
-from flask_cache import Cache
 from flask_sqlalchemy import SQLAlchemy
 from flask_httpauth import HTTPBasicAuth
 
@@ -16,7 +15,6 @@ from flask_httpauth import HTTPBasicAuth
 
 
 @app.route('/')
-@cache.cached(timeout=60)
 def page_home():
     return render_template('index.html')
 
