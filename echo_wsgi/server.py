@@ -48,10 +48,10 @@ class GxgServerProtocol(WebSocketServerProtocol):
         self.sendMessage(payload, isBinary)
 
 class GxgServerFactory(WebSocketServerFactory):
-
     protocol = GxgServerProtocol
     def __init__(self, wsuri):
         WebSocketServerFactory.__init__(self, wsuri)
+        print "init"
         self.connmanager = ConnectionManager()    
         
 
