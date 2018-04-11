@@ -24,7 +24,7 @@ from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
 
 
 # Our WebSocket Server protocol
-class EchoServerProtocol(WebSocketServerProtocol):
+class GxgServerProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
         print("Client connecting: {}".format(request.peer))
     
@@ -39,6 +39,14 @@ class EchoServerProtocol(WebSocketServerProtocol):
 
     def onMessage(self, payload, isBinary):
         self.sendMessage(payload, isBinary)
+
+class GxgServerFactory(WebSocketServerFactory):
+
+    protocol = GxgServerProtocol
+    def __init__(self, wsuri):
+        WebSocketServerFactory.__init__(self, wsuri)        
+
+
 
 
 # Our WSGI application .. in this case Flask based
@@ -153,8 +161,8 @@ if __name__ == "__main__":
                                                       'keys/server.crt')
 
     # create a Twisted Web resource for our WebSocket server
-    wsFactory = WebSocketServerFactory(u"wss://127.0.0.1:9000")
-    wsFactory.protocol = EchoServerProtocol
+    wsFactory = GxgServerFactory(u"wss://127.0.0.1:9000")
+
     wsResource = WebSocketResource(wsFactory)
 
     # create a Twisted Web WSGI resource for our Flask server
