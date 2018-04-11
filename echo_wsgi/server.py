@@ -1,5 +1,6 @@
 import uuid
 import sys,os
+from manager import ConnectionManager
 
 from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
@@ -23,10 +24,14 @@ from autobahn.twisted.websocket import WebSocketServerFactory, \
 from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
 
 
+
+
+
 # Our WebSocket Server protocol
 class GxgServerProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
         print("Client connecting: {}".format(request.peer))
+        
     
     def onOpen(self):
         pass
@@ -44,7 +49,8 @@ class GxgServerFactory(WebSocketServerFactory):
 
     protocol = GxgServerProtocol
     def __init__(self, wsuri):
-        WebSocketServerFactory.__init__(self, wsuri)        
+        WebSocketServerFactory.__init__(self, wsuri)    
+        
 
 
 
