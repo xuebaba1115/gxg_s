@@ -30,7 +30,8 @@ from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
 # Our WebSocket Server protocol
 class GxgServerProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
-        print("Client connecting: {}".format(request.peer))        
+        print("Client connecting: {}".format(request.peer))    
+        self.factory.connmanager.addConnection(self)   
         
     
     def onOpen(self):
