@@ -30,7 +30,9 @@ db = SQLAlchemy(app)
 auth = HTTPBasicAuth()
 app.secret_key = str(uuid.uuid4())
 
-
+app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 
 
 if __name__ == "__main__":
