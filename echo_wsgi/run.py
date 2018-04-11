@@ -11,7 +11,6 @@ from twisted.web.wsgi import WSGIResource
 
 from flask_cache import Cache
 from flask import Flask, render_template,abort, request, jsonify, g, url_for
-from flask.ext import restful
 from flask_sqlalchemy import SQLAlchemy
 from flask_httpauth import HTTPBasicAuth
 
