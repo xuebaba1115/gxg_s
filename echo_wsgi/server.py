@@ -50,6 +50,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
 class GxgServerFactory(WebSocketServerFactory):
     protocol = GxgServerProtocol
     def __init__(self, wsuri):
+        print wsuri
         WebSocketServerFactory.__init__(self, wsuri)
         self.connmanager = ConnectionManager()    
         
@@ -180,12 +181,12 @@ if __name__ == "__main__":
     # the path "/ws" served by our WebSocket stuff
     rootResource = WSGIRootResource(wsgiResource, {b'ws': wsResource})
 
-    # listenWS(wsFactory, contextFactory)
+    listenWS(wsFactory, contextFactory)
     
 
     # create a Twisted Web Site and run everything
     site = Site(rootResource)
     
-    reactor.listenSSL(9090, site, contextFactory)
-    # reactor.listenTCP(9090, site)
+    # reactor.listenSSL(9090, site, contextFactory)
+    reactor.listenTCP(9090, site)
     reactor.run()
