@@ -25,8 +25,6 @@ from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
 
 
 
-
-
 # Our WebSocket Server protocol
 class GxgServerProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
@@ -35,14 +33,15 @@ class GxgServerProtocol(WebSocketServerProtocol):
         
     
     def onOpen(self):
-        print "open"
-        self.factory.connmanager.pushObject("servce send")
+        self.factory.connmanager.pushObject("servce say open")
         pass
 
     def onClose(self, wasClean, code, reason):
+        self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
         pass
 
     def connectionLost(self, reason):    
+        self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
         pass
 
     def onMessage(self, payload, isBinary):
@@ -51,12 +50,9 @@ class GxgServerProtocol(WebSocketServerProtocol):
 class GxgServerFactory(WebSocketServerFactory):
     protocol = GxgServerProtocol
     def __init__(self, wsuri):
-        print wsuri
         WebSocketServerFactory.__init__(self, wsuri)
         self.connmanager = ConnectionManager()    
         
-
-
 
 
 # Our WSGI application .. in this case Flask based
@@ -121,10 +117,6 @@ def verify_password(username_or_token, password):
 @cache.cached(timeout=60)
 def page_home():
     return render_template('index.html')
-
-@app.route('/login')
-def hello():
-    return 'Hello, World!'
 
 @app.route('/api/users', methods = ['POST'])
 def new_user():

@@ -10,7 +10,6 @@ class ConnectionManager:
         """初始化
         @param _connections: dict {connID:conn Object}
         """
-        print "################"
         self._connections = {}
 
     def getNowConnCnt(self):
@@ -59,8 +58,6 @@ class ConnectionManager:
                     conn.safeData(msg)
             except Exception, e:
                 log.err(str(e))
-
-
 
 class Connection:
     """
