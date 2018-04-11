@@ -90,8 +90,20 @@ class User(db.Model):
         user = User.query.get(data['id'])
         return user
 
+@auth.verify_password
+def verify_password(username_or_token, password):
+    # first try to authenticate by token
+    user = User.verify_auth_token(username_or_token)
+    if not user:
+        # try to authenticate with username/password
+        user = User.query.filter_by(username=username_or_token).first()
+        if not user or not user.verify_password(password):
+            return False
+    g.user = user
+    return True    
 
 
+#route
 @app.route('/')
 @cache.cached(timeout=60)
 def page_home():
@@ -113,12 +125,17 @@ def new_user():
     user.hash_password(password)
     db.session.add(user)
     db.session.commit()
-    return jsonify({ 'username': user.username }), 201
+    return jsonify({ 'username': user.username })
 
+
+@app.route('/api/resource')
+@auth.login_required
+def get_resource():
+    return jsonify({ 'data': 'Hello, %s!' % g.user.username })
 
 api.add_resource(HelloWorld, '/<string:todo_id>')
 
-
+#
 if __name__ == "__main__":
     if not os.path.exists('db.sqlite'):
         db.create_all()
