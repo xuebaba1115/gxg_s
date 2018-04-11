@@ -1,7 +1,6 @@
 import uuid,os
 import sys
 
-from models import db
 from protocol import GxgServerFactory,GxgServerProtocol
 
 from twisted.python import log
