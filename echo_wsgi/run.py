@@ -1,5 +1,8 @@
-import uuid
+import uuid,os
 import sys
+
+from models import db
+from protocol import GxgServerFactory,GxgServerProtocol
 
 from twisted.python import log
 from twisted.internet import reactor,ssl
@@ -17,60 +20,19 @@ from autobahn.twisted.websocket import WebSocketServerFactory, \
 from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
 
 
-# Our WebSocket Server protocol
-class EchoServerProtocol(WebSocketServerProtocol):
-    def onConnect(self, request):
-        print("Client connecting: {}".format(request.peer))
-    
-    def onOpen(self):
-        pass
-
-    def onClose(self, wasClean, code, reason):
-        pass
-
-    def connectionLost(self, reason):    
-        pass
-
-    def onMessage(self, payload, isBinary):
-        self.sendMessage(payload, isBinary)
-
-
-class HelloWorld(restful.Resource):
-    def get(self,todo_id):
-        return {'hello': todo_id}        
-
 
 # Our WSGI application .. in this case Flask based
 app = Flask(__name__)
 cache = Cache(app)
-api = restful.Api(app)
 app.secret_key = str(uuid.uuid4())
 
 
-@app.route('/')
-@cache.cached(timeout=60)
-def page_home():
-    return render_template('index.html')
-
-@app.route('/login')
-def hello():
-    return 'Hello, World!'
-
-@app.route('/api/users', methods = ['POST'])
-def new_user():
-    username = request.json.get('username')
-    password = request.json.get('password')
-    if username is None or password is None:
-        abort(400) # missing arguments
-
-    return jsonify({ 'username': username }),201
-
-
-
-api.add_resource(HelloWorld, '/<string:todo_id>')
 
 
 if __name__ == "__main__":
+
+    if not os.path.exists('db.sqlite'):
+        db.create_all()
 
     log.startLogging(sys.stdout)
 
@@ -78,8 +40,8 @@ if __name__ == "__main__":
                                                       'keys/server.crt')
 
     # create a Twisted Web resource for our WebSocket server
-    wsFactory = WebSocketServerFactory(u"wss://127.0.0.1:9000")
-    wsFactory.protocol = EchoServerProtocol
+    wsFactory = GxgServerFactory(u"wss://127.0.0.1:9000")
+
     wsResource = WebSocketResource(wsFactory)
 
     # create a Twisted Web WSGI resource for our Flask server
