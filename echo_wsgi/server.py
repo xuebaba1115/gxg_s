@@ -65,7 +65,6 @@ class GxgServerFactory(WebSocketServerFactory):
 # Our WSGI application .. in this case Flask based
 app = Flask(__name__)
 cache = Cache(app)
-api = restful.Api(app)
 app.secret_key = str(uuid.uuid4())
 
 #config
