@@ -3,6 +3,7 @@ import sys,os
 
 from run import app,cache
 from models import User,db,auth
+from views import *
 
 from flask import Flask, render_template,abort, request, jsonify, g, url_for
 from flask_cache import Cache
