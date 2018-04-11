@@ -11,7 +11,6 @@ from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
 
 
-from flask_cache import Cache
 from flask import Flask, render_template,abort, request, jsonify, g, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_httpauth import HTTPBasicAuth
@@ -64,7 +63,6 @@ class GxgServerFactory(WebSocketServerFactory):
 
 # Our WSGI application .. in this case Flask based
 app = Flask(__name__)
-cache = Cache(app)
 app.secret_key = str(uuid.uuid4())
 
 #config
@@ -120,7 +118,6 @@ def verify_password(username_or_token, password):
 
 #route
 @app.route('/')
-@cache.cached(timeout=60)
 def page_home():
     return render_template('index.html')
 
