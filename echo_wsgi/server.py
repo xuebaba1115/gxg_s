@@ -34,6 +34,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
         
     
     def onOpen(self):
+        print "open"
         self.factory.connmanager.pushObject("servce send")
         pass
 

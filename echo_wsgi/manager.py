@@ -52,6 +52,7 @@ class ConnectionManager:
         """主动推送消息
         """
         for target in self._connections:
+            print target
             try:
                 conn = self.getConnectionByID(target)
                 if conn:
