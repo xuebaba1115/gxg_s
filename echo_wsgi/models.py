@@ -9,13 +9,13 @@ from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSign
 from flask import Flask, render_template,abort, request, jsonify, g, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_httpauth import HTTPBasicAuth
-from run import app
+from run import app,db
 
 
 
 
-db = SQLAlchemy(app)
-auth = HTTPBasicAuth()
+
+
 
 
 

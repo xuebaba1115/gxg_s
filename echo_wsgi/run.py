@@ -13,6 +13,8 @@ from twisted.web.wsgi import WSGIResource
 from flask_cache import Cache
 from flask import Flask, render_template,abort, request, jsonify, g, url_for
 from flask.ext import restful
+from flask_sqlalchemy import SQLAlchemy
+from flask_httpauth import HTTPBasicAuth
 
 from autobahn.twisted.websocket import WebSocketServerFactory, \
     WebSocketServerProtocol,listenWS
@@ -24,6 +26,8 @@ from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
 # Our WSGI application .. in this case Flask based
 app = Flask(__name__)
 cache = Cache(app)
+db = SQLAlchemy(app)
+auth = HTTPBasicAuth()
 app.secret_key = str(uuid.uuid4())
 
 
