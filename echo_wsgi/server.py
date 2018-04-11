@@ -1,6 +1,9 @@
 import uuid
 import sys,os
 
+from passlib.apps import custom_app_context as pwd_context
+from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
+
 from twisted.python import log
 from twisted.internet import reactor,ssl
 from twisted.web.server import Site
@@ -85,7 +88,7 @@ class User(db.Model):
         except BadSignature:
             return None    # invalid token
         user = User.query.get(data['id'])
-return user
+        return user
 
 
 
