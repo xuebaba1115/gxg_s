@@ -11,6 +11,7 @@ class ConnectionManager:
         @param _connections: dict {connID:conn Object}
         """
         self._connections = {}
+        self._connections.items
 
     def getNowConnCnt(self):
         """获取当前连接数量"""
@@ -47,14 +48,14 @@ class ConnectionManager:
         if conn:
             conn.loseConnection()
 
-    def pushObject(self,topicID , msg, sendList):
+    def pushObject(self, msg):
         """主动推送消息
         """
-        for target in sendList:
+        for target in self._connections:
             try:
                 conn = self.getConnectionByID(target)
                 if conn:
-                    conn.safeToWriteData(topicID,msg)
+                    conn.safeData(msg)
             except Exception, e:
                 log.err(str(e))
 
