@@ -41,11 +41,6 @@ class EchoServerProtocol(WebSocketServerProtocol):
         self.sendMessage(payload, isBinary)
 
 
-class HelloWorld(restful.Resource):
-    def get(self,todo_id):
-        return {'hello': todo_id}        
-
-
 # Our WSGI application .. in this case Flask based
 app = Flask(__name__)
 cache = Cache(app)
@@ -133,7 +128,13 @@ def new_user():
 def get_resource():
     return jsonify({ 'data': 'Hello, %s!' % g.user.username })
 
-api.add_resource(HelloWorld, '/<string:todo_id>')
+@app.route('/api/token')
+@auth.login_required
+def get_auth_token():
+    token = g.user.generate_auth_token()
+    return jsonify({ 'token': token.decode('ascii') })
+
+
 
 #
 if __name__ == "__main__":
