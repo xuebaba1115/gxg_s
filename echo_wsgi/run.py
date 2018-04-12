@@ -2,14 +2,13 @@ import uuid,os
 import sys
 
 from protocol import GxgServerFactory,GxgServerProtocol
+from views.users import users,db
 
 from twisted.python import log
 from twisted.internet import reactor,ssl
 from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
 
-
-from flask_cache import Cache
 from flask import Flask, render_template,abort, request, jsonify, g, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_httpauth import HTTPBasicAuth
@@ -23,9 +22,10 @@ from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
 
 # Our WSGI application .. in this case Flask based
 app = Flask(__name__)
-from views import *
 db = SQLAlchemy(app)
-auth = HTTPBasicAuth()
+
+
+app.register_blueprint(users)
 app.secret_key = str(uuid.uuid4())
 
 app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
