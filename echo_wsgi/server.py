@@ -74,8 +74,9 @@ class GxgServerProtocol(WebSocketServerProtocol):
         print("Client connecting: {}".format(request.peer))    
         self.factory.connmanager.addConnection(self)                  
         tk=request.params
+        print tk.get('token')
         if not tk.get('token'):
-            youhu = User.verify_auth_token(tk.get('token').pop())
+            youhu = User.verify_auth_token(tk['token'].pop())
             if not youhu:
                 self.dropConnection(self)
         else:
