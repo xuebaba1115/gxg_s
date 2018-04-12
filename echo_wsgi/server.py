@@ -57,7 +57,7 @@ class User(db.Model):
     @staticmethod
     def verify_auth_token(token):
         print token
-        s = Serializer(app.config['SECRET_KEY'][0])
+        s = Serializer(app.config['SECRET_KEY'])
         try:
             data = s.loads(token)
             print data
@@ -79,7 +79,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
         self.factory.connmanager.addConnection(self)                  
         print request.params
         tk=request.params
-        youhu = User.verify_auth_token(tk['token'])
+        youhu = User.verify_auth_token(tk['token'].pop())
         print youhu,'user'
         if not youhu:
             self.onClose(self,5001,None)      
