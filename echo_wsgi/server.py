@@ -38,7 +38,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
         print request.extensions
         tk=request.params
         youhu = User.verify_auth_token(tk['token'])
-        print youhu
+        print youhu.username
         if not youhu:
             self.onClose(self,5001,None)      
 
