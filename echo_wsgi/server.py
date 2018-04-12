@@ -38,7 +38,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
         print request.extensions
         tk=request.params
         youhu = User.verify_auth_token(tk['token'])
-        print youhu.username
+        print youhu,'user'
         if not youhu:
             self.onClose(self,5001,None)      
 
@@ -107,6 +107,7 @@ class User(db.Model):
         except BadSignature:
             return None    # invalid token
         user = User.query.get(data['id'])
+        print user
         return user
 
 @auth.verify_password
