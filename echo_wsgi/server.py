@@ -71,14 +71,14 @@ class User(db.Model):
 # Our WebSocket Server protocol
 class GxgServerProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
-        print("Client connecting: {}".format(request.peer))                    
+        print("Client connecting: {}".format(request.peer))  
+        self.factory.connmanager.addConnection(self)                  
         tk=request.params
         if tk.get('token'):
             youhu = User.verify_auth_token(tk['token'].pop())
             if not youhu:
                 self.dropConnection(self)  
             else:
-                self.factory.connmanager.addConnection(self)
                 self.factory.connmanager.pushObject("servce say open")               
         else:
             self.dropConnection(self)          
