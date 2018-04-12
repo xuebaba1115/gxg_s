@@ -60,12 +60,9 @@ class User(db.Model):
         s = Serializer(app.config['SECRET_KEY'])
         try:
             data = s.loads(token)
-            print data
         except SignatureExpired:
-            print 1
             return None    # valid token, but expired
         except BadSignature:
-            print 2
             return None    # invalid token
         user = User.query.get(data['id'])
         return user
@@ -82,7 +79,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
         youhu = User.verify_auth_token(tk['token'].pop())
         print youhu,'user'
         if not youhu:
-            self.onClose(self,5001,None)      
+            self.onClose(self,True,None)      
 
         
     
