@@ -78,9 +78,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
         tk=request.params
         youhu = User.verify_auth_token(tk['token'].pop())
         if not youhu:
-            self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
-            
-               
+            self.dropConnection(self)
   
     
     def onOpen(self):
