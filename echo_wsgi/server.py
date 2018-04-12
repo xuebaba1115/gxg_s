@@ -107,7 +107,7 @@ class User(db.Model):
         except BadSignature:
             return None    # invalid token
         user = User.query.get(data['id'])
-        print user
+        print user,'#######'
         return user
 
 @auth.verify_password
