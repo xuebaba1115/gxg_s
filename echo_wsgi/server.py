@@ -81,12 +81,13 @@ class GxgServerProtocol(WebSocketServerProtocol):
         else:
             self.dropConnection(self)
 
-        self.factory.connmanager.addConnection(self)              
+        self.factory.connmanager.addConnection(self)
+        self.factory.connmanager.pushObject("servce say open")              
   
     
     def onOpen(self):
-        
-        self.factory.connmanager.pushObject("servce say open")
+
+        print "open"
         pass
 
     def onClose(self, wasClean, code, reason):
