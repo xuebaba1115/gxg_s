@@ -68,6 +68,7 @@ class User(db.Model):
         return user
 
 
+
 # Our WebSocket Server protocol
 class GxgServerProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
