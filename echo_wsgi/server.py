@@ -40,7 +40,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
         youhu = User.verify_auth_token(tk['token'])
         print youhu
         if not youhu:
-            self.onClose(self,True,500,None)      
+            self.onClose(True,5001,None)      
 
         
     
