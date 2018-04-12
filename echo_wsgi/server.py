@@ -60,12 +60,14 @@ class User(db.Model):
         s = Serializer(app.config['SECRET_KEY'])
         try:
             data = s.loads(token)
+            print data
         except SignatureExpired:
+            print 1
             return None    # valid token, but expired
         except BadSignature:
+            print 2
             return None    # invalid token
         user = User.query.get(data['id'])
-        print user,'#######'
         return user
 
 
@@ -77,9 +79,9 @@ class GxgServerProtocol(WebSocketServerProtocol):
         self.factory.connmanager.addConnection(self)                  
         print request.params
         tk=request.params
-        youhu1 = self.factory.youhu.verify_auth_token('aaa')
-        print youhu1,'user'
-        if not youhu1:
+        youhu = User.verify_auth_token(tk['token'])
+        print youhu,'user'
+        if not youhu:
             self.onClose(self,5001,None)      
 
         
@@ -103,8 +105,7 @@ class GxgServerFactory(WebSocketServerFactory):
     protocol = GxgServerProtocol
     def __init__(self, wsuri):
         WebSocketServerFactory.__init__(self, wsuri)
-        self.connmanager = ConnectionManager()
-        self.youhu=User()  
+        self.connmanager = ConnectionManager() 
           
 
 
