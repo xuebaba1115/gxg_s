@@ -50,7 +50,7 @@ class User(db.Model):
     def verify_password(self, password):
         return pwd_context.verify(password, self.password_hash)
 
-    def generate_auth_token(self, expiration=60):
+    def generate_auth_token(self, expiration=600):
         s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
         return s.dumps({'id': self.id})
 
@@ -77,11 +77,11 @@ class GxgServerProtocol(WebSocketServerProtocol):
         print request.params
         tk=request.params
         youhu = User.verify_auth_token(tk['token'].pop())
-        print youhu,'user'
         if not youhu:
-            self.onClose(self,True,None)      
-
-        
+            self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
+            
+               
+  
     
     def onOpen(self):
         self.factory.connmanager.pushObject("servce say open")
