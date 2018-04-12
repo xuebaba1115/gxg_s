@@ -23,6 +23,21 @@ from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
 
 
 
+# Our WSGI application .. in this case Flask based
+app = Flask(__name__)
+app.secret_key = str(uuid.uuid4())
+
+#config
+app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+
+# extensions
+db = SQLAlchemy(app)
+auth = HTTPBasicAuth()
+
+
+
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -95,22 +110,6 @@ class GxgServerFactory(WebSocketServerFactory):
         WebSocketServerFactory.__init__(self, wsuri)
         self.connmanager = ConnectionManager()  
           
-        
-
-
-# Our WSGI application .. in this case Flask based
-app = Flask(__name__)
-app.secret_key = str(uuid.uuid4())
-
-#config
-app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
-app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
-
-# extensions
-db = SQLAlchemy(app)
-auth = HTTPBasicAuth()
-
 
 
 
