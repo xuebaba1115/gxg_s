@@ -14,7 +14,7 @@ from flask_httpauth import HTTPBasicAuth
 auth = HTTPBasicAuth()
 
 
-users = Blueprint('users', __name__,template_folder='templates')
+userss = Blueprint('users', __name__,template_folder='templates')
 
 @users.route('/')
 def page_home():

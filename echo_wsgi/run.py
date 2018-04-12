@@ -2,7 +2,7 @@ import uuid,os
 import sys
 
 from protocol import GxgServerFactory,GxgServerProtocol
-from views import users
+from views.users import userss
 
 from twisted.python import log
 from twisted.internet import reactor,ssl
