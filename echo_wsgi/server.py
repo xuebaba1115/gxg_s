@@ -73,7 +73,6 @@ class GxgServerProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
         print("Client connecting: {}".format(request.peer))                    
         tk=request.params
-        print tk.get('token')
         if tk.get('token'):
             youhu = User.verify_auth_token(tk['token'].pop())
             if not youhu:
@@ -87,8 +86,9 @@ class GxgServerProtocol(WebSocketServerProtocol):
   
     
     def onOpen(self):
-
         print "open"
+        self.factory.connmanager.addConnection(self)
+        self.factory.connmanager.pushObject("servce say open")   
         pass
 
     def onClose(self, wasClean, code, reason):
