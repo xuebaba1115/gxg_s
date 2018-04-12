@@ -71,8 +71,7 @@ class User(db.Model):
 # Our WebSocket Server protocol
 class GxgServerProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
-        print("Client connecting: {}".format(request.peer))    
-        self.factory.connmanager.addConnection(self)                  
+        print("Client connecting: {}".format(request.peer))                    
         tk=request.params
         print tk.get('token')
         if tk.get('token'):
@@ -81,6 +80,8 @@ class GxgServerProtocol(WebSocketServerProtocol):
                 self.dropConnection(self)
         else:
             self.dropConnection(self)
+            
+        self.factory.connmanager.addConnection(self)              
   
     
     def onOpen(self):
