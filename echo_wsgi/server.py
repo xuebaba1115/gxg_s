@@ -83,7 +83,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
         print request.protocols
         print request.extensions
         tk=request.params
-        youhu1 = self.youhu.verify_auth_token(tk['token'])
+        youhu1 = self.factory.youhu.verify_auth_token(tk['token'])
         print youhu1,'user'
         if not youhu1:
             self.onClose(self,5001,None)      
