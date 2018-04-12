@@ -78,11 +78,12 @@ class GxgServerProtocol(WebSocketServerProtocol):
             youhu = User.verify_auth_token(tk['token'].pop())
             if not youhu:
                 self.dropConnection(self)
+            self.factory.connmanager.addConnection(self)
+            self.factory.connmanager.pushObject("servce say open")                   
         else:
             self.dropConnection(self)
 
-        self.factory.connmanager.addConnection(self)
-        self.factory.connmanager.pushObject("servce say open")              
+           
   
     
     def onOpen(self):
