@@ -56,6 +56,7 @@ class User(db.Model):
 
     @staticmethod
     def verify_auth_token(token):
+        print token
         s = Serializer(app.config['SECRET_KEY'])
         try:
             data = s.loads(token)
@@ -74,16 +75,9 @@ class GxgServerProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
         print("Client connecting: {}".format(request.peer))    
         self.factory.connmanager.addConnection(self)                  
-        print request.headers
-        print request.host
-        print request.path
         print request.params
-        print request.version
-        print request.origin
-        print request.protocols
-        print request.extensions
         tk=request.params
-        youhu1 = self.factory.youhu.verify_auth_token(tk['token'])
+        youhu1 = self.factory.youhu.verify_auth_token('aaa')
         print youhu1,'user'
         if not youhu1:
             self.onClose(self,5001,None)      
