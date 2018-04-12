@@ -80,11 +80,12 @@ class GxgServerProtocol(WebSocketServerProtocol):
                 self.dropConnection(self)
         else:
             self.dropConnection(self)
-            
+
         self.factory.connmanager.addConnection(self)              
   
     
     def onOpen(self):
+        
         self.factory.connmanager.pushObject("servce say open")
         pass
 
