@@ -1,9 +1,6 @@
 import uuid
 import sys,os
-from manager import ConnectionManager
 
-from passlib.apps import custom_app_context as pwd_context
-from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 
 from twisted.python import log
 from twisted.internet import reactor,ssl
@@ -18,7 +15,6 @@ from flask_httpauth import HTTPBasicAuth
 
 from autobahn.twisted.websocket import WebSocketServerFactory, \
     WebSocketServerProtocol,listenWS
-
 from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
 
 
@@ -35,10 +31,6 @@ app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 # extensions
 db = SQLAlchemy(app)
 auth = HTTPBasicAuth()
-
-
-
-
 
 
 
