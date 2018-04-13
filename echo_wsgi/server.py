@@ -80,7 +80,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
             if not youhu:
                 self.dropConnection(self)            
         else:
-            self.dropConnection(self)          
+            self._closeConnection(self)          
         
     def onOpen(self):
         print "open" 
