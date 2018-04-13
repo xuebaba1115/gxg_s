@@ -48,8 +48,10 @@ class GxgServerFactory(WebSocketServerFactory):
     def __init__(self, wsuri):
         WebSocketServerFactory.__init__(self, wsuri)
         self.connmanager = ConnectionManager() 
+        self.clients = []
         self.tickcount = 0
         self.tick()
+
 
     def tick(self):
         self.tickcount += 1
