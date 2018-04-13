@@ -10,32 +10,34 @@ from models import User
 class GxgServerProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
         print 'onconnect'
+        print request.headers
         print("Client connecting: {}".format(request.peer))                  
         tk=request.params
         if tk.get('token'):
             youhu = User.verify_auth_token(tk['token'].pop())
             if not youhu:
-                self.dropConnection(abort=True)    
-                # self.factory.connmanager.dropConnectionByID(self.transport.sessionno)        
+                self.dropConnection(abort=True)         
         else:
-            # self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
-             self.transport.loseConnection()
-            # self.dropConnection(abort=True)          
+            self.dropConnection(abort=True)          
         
     def onOpen(self):
         print "open" 
         self.factory.connmanager.addConnection(self)  
+        self.factory.register(self)
         self.factory.connmanager.pushObject("servce say open") 
         pass
 
     def onClose(self, wasClean, code, reason):
         print "onclose"
         self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
+        self.unregister(self)
         pass
 
     def connectionLost(self, reason):  
         print "connlost" 
         self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
+        WebSocketServerProtocol.connectionLost(self, reason)
+        self.factory.unregister(self)
         pass
 
     def onMessage(self, payload, isBinary):
@@ -46,6 +48,7 @@ class GxgServerFactory(WebSocketServerFactory):
     def __init__(self, wsuri):
         WebSocketServerFactory.__init__(self, wsuri)
         self.connmanager = ConnectionManager() 
+        self.tick()
 
     def tick(self):
         self.tickcount += 1

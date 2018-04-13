@@ -7,6 +7,12 @@
 
          window.onload = function() {
 
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", 'https://www.tongqiaocun.com/api/token', true);
+            xhr.send();
+            token=xhr.responseXML;  
+            console.log(token)      
+
             ellog = document.getElementById('log');
 
             var wsuri;
@@ -59,6 +65,7 @@
    <body>
       <h1>Autobahn WebSocket Echo Test</h1>
       <noscript>You must enable JavaScript</noscript>
+
       <form>
          <p>Message: <input id="message" type="text" size="50" maxlength="50" value="Hello, world!"></p>
       </form>
