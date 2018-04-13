@@ -30,7 +30,6 @@ class ConnectionManager:
         @param connID: int 连接的id
         """
         try:
-            print '######'
             del self._connections[connID]
         except Exception as e:
             log.msg(str(e))
