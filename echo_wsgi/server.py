@@ -71,6 +71,7 @@ class User(db.Model):
 # Our WebSocket Server protocol
 class GxgServerProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
+        print 'onconnect'
         print("Client connecting: {}".format(request.peer))  
         self.factory.connmanager.addConnection(self)                  
         tk=request.params
@@ -87,10 +88,12 @@ class GxgServerProtocol(WebSocketServerProtocol):
         pass
 
     def onClose(self, wasClean, code, reason):
+        print "onclose"
         self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
         pass
 
-    def connectionLost(self, reason):    
+    def connectionLost(self, reason):  
+        print "connlost" 
         self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
         pass
 
