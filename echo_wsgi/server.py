@@ -108,6 +108,28 @@ class GxgServerFactory(WebSocketServerFactory):
     def __init__(self, wsuri):
         WebSocketServerFactory.__init__(self, wsuri)
         self.connmanager = ConnectionManager() 
+
+    def tick(self):
+        self.tickcount += 1
+        self.broadcast("tick %d from server" % self.tickcount)
+        reactor.callLater(1, self.tick)
+
+    def register(self, client):
+        if client not in self.clients:
+            print("registered client {}".format(client.peer))
+            self.clients.append(client)
+
+    def unregister(self, client):
+        if client in self.clients:
+            print("unregistered client {}".format(client.peer))
+            self.clients.remove(client)
+
+    def broadcast(self, msg):
+        print("broadcasting prepared message '{}' ..".format(msg))
+        preparedMsg = self.prepareMessage(msg)
+        for c in self.clients:
+            c.sendPreparedMessage(preparedMsg)
+            print("prepared message sent to {}".format(c.peer))
           
 
 
