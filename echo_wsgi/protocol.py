@@ -3,31 +3,38 @@ from twisted.internet import reactor
 from autobahn.twisted.websocket import WebSocketServerFactory, \
     WebSocketServerProtocol,listenWS
 
+from models import User
 
 
+# Our WebSocket Server protocol
 class GxgServerProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
-        print("Client connecting: {}".format(request.peer))    
-        self.factory.connmanager.addConnection(self)                  
-        # print request.headers
-        # print request.host
-        # print request.path
-        # print request.params
-        # print request.version
-        # print request.origin
-        # print request.protocols
-        # print request.extensions
+        print 'onconnect'
+        print("Client connecting: {}".format(request.peer))                  
+        tk=request.params
+        if tk.get('token'):
+            youhu = User.verify_auth_token(tk['token'].pop())
+            if not youhu:
+                self.dropConnection(abort=True)    
+                # self.factory.connmanager.dropConnectionByID(self.transport.sessionno)        
+        else:
+            # self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
+             self.transport.loseConnection()
+            # self.dropConnection(abort=True)          
         
-    
     def onOpen(self):
-        self.factory.connmanager.pushObject("servce say open")
+        print "open" 
+        self.factory.connmanager.addConnection(self)  
+        self.factory.connmanager.pushObject("servce say open") 
         pass
 
     def onClose(self, wasClean, code, reason):
+        print "onclose"
         self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
         pass
 
-    def connectionLost(self, reason):    
+    def connectionLost(self, reason):  
+        print "connlost" 
         self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
         pass
 
@@ -38,5 +45,26 @@ class GxgServerFactory(WebSocketServerFactory):
     protocol = GxgServerProtocol
     def __init__(self, wsuri):
         WebSocketServerFactory.__init__(self, wsuri)
-        self.connmanager = ConnectionManager()    
-        
+        self.connmanager = ConnectionManager() 
+
+    def tick(self):
+        self.tickcount += 1
+        self.broadcast("tick %d from server" % self.tickcount)
+        reactor.callLater(1, self.tick)
+
+    def register(self, client):
+        if client not in self.clients:
+            print("registered client {}".format(client.peer))
+            self.clients.append(client)
+
+    def unregister(self, client):
+        if client in self.clients:
+            print("unregistered client {}".format(client.peer))
+            self.clients.remove(client)
+
+    def broadcast(self, msg):
+        print("broadcasting prepared message '{}' ..".format(msg))
+        preparedMsg = self.prepareMessage(msg)
+        for c in self.clients:
+            c.sendPreparedMessage(preparedMsg)
+            print("prepared message sent to {}".format(c.peer))
