@@ -81,7 +81,8 @@ class GxgServerProtocol(WebSocketServerProtocol):
                 # self.factory.connmanager.dropConnectionByID(self.transport.sessionno)        
         else:
             # self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
-            self.dropConnection(abort=True)          
+             self.transport.loseConnection()
+            # self.dropConnection(abort=True)          
         
     def onOpen(self):
         print "open" 
