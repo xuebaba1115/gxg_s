@@ -72,20 +72,20 @@ class User(db.Model):
 class GxgServerProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
         print 'onconnect'
-        print("Client connecting: {}".format(request.peer))  
-        self.factory.connmanager.addConnection(self)                  
+        print("Client connecting: {}".format(request.peer))                  
         tk=request.params
         if tk.get('token'):
             youhu = User.verify_auth_token(tk['token'].pop())
             if not youhu:
                 self.dropConnection(abort=True)    
-                self.factory.connmanager.dropConnectionByID(self.transport.sessionno)        
+                # self.factory.connmanager.dropConnectionByID(self.transport.sessionno)        
         else:
-            self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
+            # self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
             self.dropConnection(abort=True)          
         
     def onOpen(self):
         print "open" 
+        self.factory.connmanager.addConnection(self)  
         self.factory.connmanager.pushObject("servce say open") 
         pass
 
