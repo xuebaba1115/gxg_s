@@ -80,6 +80,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
             if not youhu:
                 self.dropConnection(self)            
         else:
+            self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
             self._closeConnection(self)          
         
     def onOpen(self):
