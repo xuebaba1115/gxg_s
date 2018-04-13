@@ -37,13 +37,9 @@ db = SQLAlchemy(app)
 auth = HTTPBasicAuth()
 
 
-from models import User
-from profile import GxgServerFactory,GxgServerProtocol
 
 
 
-
-          
 
 
 
@@ -101,6 +97,8 @@ def get_auth_token():
 
 #
 if __name__ == "__main__":
+    from models import User
+    from profile import GxgServerFactory,GxgServerProtocol
     if not os.path.exists('db.sqlite'):
         db.create_all()
 
