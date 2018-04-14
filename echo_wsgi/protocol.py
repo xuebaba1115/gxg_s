@@ -25,7 +25,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
         print "open" 
         self.factory.connmanager.addConnection(self)  
         self.factory.register(self)
-        self.factory.connmanager.pushObject(json.dump({"data":"servce say open"})) 
+        self.factory.connmanager.pushObject(json.dumps({"data":"servce say open"})) 
         pass
 
     def onClose(self, wasClean, code, reason):
@@ -56,7 +56,7 @@ class GxgServerFactory(WebSocketServerFactory):
 
     def tick(self):
         self.tickcount += 1
-        self.broadcast("tick %d from server" % self.tickcount)
+        self.broadcast(json.dumps({"data":"tick %d from server" % self.tickcount}))
         reactor.callLater(60, self.tick)
 
     def register(self, client):
