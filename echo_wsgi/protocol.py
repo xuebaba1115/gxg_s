@@ -1,3 +1,4 @@
+import json
 from manager import ConnectionManager
 from twisted.internet import reactor
 from autobahn.twisted.websocket import WebSocketServerFactory, \
@@ -24,7 +25,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
         print "open" 
         self.factory.connmanager.addConnection(self)  
         self.factory.register(self)
-        self.factory.connmanager.pushObject("servce say open") 
+        self.factory.connmanager.pushObject(json.dump({"data":"servce say open"})) 
         pass
 
     def onClose(self, wasClean, code, reason):
