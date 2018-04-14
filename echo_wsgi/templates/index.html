@@ -1,75 +1,102 @@
 <!DOCTYPE html>
 <html>
-   <head>
-      <script type="text/javascript">
-         var sock = null;
-         var ellog = null;
 
-         window.onload = function() {
+<head>
+    <script type="text/javascript">
+        function loadXMLDoc() {
+             var xmlhttp = new XMLHttpRequest();
+            if (window.XMLHttpRequest) {// code for all new browsers
+                xmlhttp = new XMLHttpRequest();
+            }
+            else if (window.ActiveXObject) {// code for IE5 and IE6
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            if (xmlhttp != null) {
+                xmlhttp.onreadystatechange = state_Change;
+                xmlhttp.open("GET", "http://127.0.0.1:9090/api/token", true, "xlc1", "xlc");
+                xmlhttp.send();
+                document.write(xmlHttp.responseText);
+            }
+            else {
+                alert("Your browser does not support XMLHTTP.");
+            }
+        }
 
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", 'https://www.tongqiaocun.com/api/token', true);
-            xhr.send();
-            token=xhr.responseXML;  
-            console.log(token)      
+        function state_Change() {
+            if (xmlhttp.readyState == 4) {// 4 = "loaded"
+                if (xmlhttp.status == 200) {// 200 = OK
+                    // ...our code here...
+                }
+                else {
+                    alert("Problem retrieving XML data");
+                }
+            }
+        }
 
+        var sock = null;
+        var ellog = null;
+
+        window.onload = function () {
             ellog = document.getElementById('log');
 
             var wsuri;
             if (window.location.protocol === "file:") {
-               wsuri = "wss://127.0.0.1:9000/ws";
+                wsuri = "wss://127.0.0.1:9000/ws";
             } else {
-               wsuri = "wss://" + window.location.hostname + ":9000/ws";
+                wsuri = "wss://" + window.location.hostname + ":9000/ws";
             }
 
             if ("WebSocket" in window) {
-               sock = new WebSocket(wsuri);
+                sock = new WebSocket(wsuri);
             } else if ("MozWebSocket" in window) {
-               sock = new MozWebSocket(wsuri);
+                sock = new MozWebSocket(wsuri);
             } else {
-               log("Browser does not support WebSocket!");
+                log("Browser does not support WebSocket!");
             }
 
             if (sock) {
-               sock.onopen = function() {
-                  log("Connected to " + wsuri);
-               }
+                sock.onopen = function () {
+                    log("Connected to " + wsuri);
+                }
 
-               sock.onclose = function(e) {
-                  log("Connection closed (wasClean = " + e.wasClean + ", code = " + e.code + ", reason = '" + e.reason + "')");
-                  sock = null;
-               }
+                sock.onclose = function (e) {
+                    log("Connection closed (wasClean = " + e.wasClean + ", code = " + e.code + ", reason = '" + e.reason + "')");
+                    sock = null;
+                }
 
-               sock.onmessage = function(e) {
-                  log("Got echo: " + e.data);
-               }
+                sock.onmessage = function (e) {
+                    log("Got echo: " + e.data);
+                }
             }
-         };
+        };
 
-         function send() {
+        function send() {
             var msg = document.getElementById('message').value;
             if (sock) {
-               sock.send(msg);
-               log("Sent: " + msg);
+                sock.send(msg);
+                log("Sent: " + msg);
             } else {
-               log("Not connected.");
+                log("Not connected.");
             }
-         };
+        };
 
-         function log(m) {
+        function log(m) {
             ellog.innerHTML += m + '\n';
             ellog.scrollTop = ellog.scrollHeight;
-         };
-      </script>
-   </head>
-   <body>
-      <h1>Autobahn WebSocket Echo Test</h1>
-      <noscript>You must enable JavaScript</noscript>
+        };
+    </script>
+</head>
 
-      <form>
-         <p>Message: <input id="message" type="text" size="50" maxlength="50" value="Hello, world!"></p>
-      </form>
-      <button onclick='send();'>Send Message</button>
-      <pre id="log" style="height: 20em; overflow-y: scroll; background-color: #faa;"></pre>
-   </body>
+<body>
+    <h1>Autobahn WebSocket Echo Test</h1>
+    <noscript>You must enable JavaScript</noscript>
+
+    <form>
+        <p>Message: <input id="message" type="text" size="50" maxlength="50" value="Hello, world!"></p>
+    </form>
+    <button onclick='send();'>Send Message</button>
+    <button onclick='loadXMLDoc();'>Token</button>
+    <pre id="log" style="height: 20em; overflow-y: scroll; background-color: #faa;"></pre>
+</body>
+
 </html>
