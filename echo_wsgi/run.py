@@ -8,7 +8,7 @@ from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
 
 
-from flask import Flask, render_template,abort, request, jsonify, g, url_for
+from flask import Flask, render_template,abort, request, jsonify, g, url_for,make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_httpauth import HTTPBasicAuth
 
@@ -83,7 +83,12 @@ def get_resource():
 @auth.login_required
 def get_auth_token():
     token = g.user.generate_auth_token()
-    return jsonify({ 'token': token.decode('ascii') })
+    response = make_response(jsonify({ 'token': token.decode('ascii') }))
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET,POST'
+    response.headers['Access-Control-Allow-Headers'] = 'x-requested-with,content-type' 
+    return response
+
 
 
 
