@@ -86,10 +86,10 @@ def get_auth_token():
     response = make_response(jsonify({ 'token': token.decode('ascii') }))
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Methods'] = 'GET,POST'
-    response.headers['Access-Control-Allow-Headers'] = 'x-requested-with,content-type' 
+    response.headers['Access-Control-Allow-Methods'] = 'PUT,GET,POST,DELETE'
+    allow_headers = "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-Witht"
+    response.headers['Access-Control-Allow-Headers'] = allow_headers
     return response
-
-
 
 
 #
