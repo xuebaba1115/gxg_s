@@ -78,7 +78,7 @@ def get_user(id):
 @auth.login_required
 def get_resource():
     token = g.user.generate_auth_token()
-    return jsonify([{ 'data': 'Hello, %s!' % g.user.username},{ 'token': token.decode('ascii') }])
+    return jsonify({ 'data': 'Hello, %s!' % g.user.username, 'token': token.decode('ascii') })
 
 @app.route('/api/token')
 @auth.login_required
