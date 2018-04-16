@@ -30,15 +30,15 @@ class GxgServerProtocol(WebSocketServerProtocol):
 
     def onClose(self, wasClean, code, reason):
         print "onclose"
-        self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
         self.unregister(self)
+        self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
         pass
 
     def connectionLost(self, reason):  
         print "connlost" 
         self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
-        WebSocketServerProtocol.connectionLost(self, reason)
         self.factory.unregister(self)
+        WebSocketServerProtocol.connectionLost(self, reason)
         pass
 
     def onMessage(self, payload, isBinary):
