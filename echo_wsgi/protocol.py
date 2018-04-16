@@ -22,9 +22,9 @@ class GxgServerProtocol(WebSocketServerProtocol):
         
     def onOpen(self):
         print "open" 
-        self.factory.connmanager.addConnection(self)  
+        connid=self.factory.connmanager.addConnection(self)  
         self.factory.register(self)
-        self.factory.connmanager.pushObjectbyconnID(json.dumps({"data":"servce say open"})) 
+        self.factory.connmanager.pushObjectbyconnID(json.dumps({"data":"servce say open","connid":connid})) 
         pass
 
     def onClose(self, wasClean, code, reason):
@@ -68,15 +68,15 @@ class GxgServerFactory(WebSocketServerFactory):
             print("unregistered client {}".format(client.peer))
             self.clients.remove(client)
 
+    def broadcast(self, msg):
+        print("broadcasting prepared message '{}' ..".format(msg))
+        preparedMsg = self.prepareMessage(msg)
+        self.connmanager.pushObjectall(preparedMsg)
+              
+
     # def broadcast(self, msg):
     #     print("broadcasting prepared message '{}' ..".format(msg))
     #     preparedMsg = self.prepareMessage(msg)
     #     for c in self.clients:
     #         c.sendPreparedMessage(preparedMsg)
     #         print("prepared message sent to {}".format(c.peer))
-
-    def broadcast(self, msg):
-        print("broadcasting prepared message '{}' ..".format(msg))
-        preparedMsg = self.prepareMessage(msg)
-        self.connmanager.pushObjectall(preparedMsg)
-  

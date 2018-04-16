@@ -24,6 +24,7 @@ class ConnectionManager:
         if _conn.id in self._connections:
             raise Exception("系统记录冲突")
         self._connections[_conn.id] = _conn
+        return _conn.id
 
     def dropConnectionByID(self, connID):
         """根据连接的id删除连接实例
