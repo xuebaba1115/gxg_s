@@ -30,7 +30,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
 
     def onClose(self, wasClean, code, reason):
         print "onclose"
-        self.unregister(self)
+        self.factory.unregister(self)
         self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
         pass
 
