@@ -98,5 +98,5 @@ class Connection:
     def preparedData(self,msg):
         """发送消息
         """
-        self.instance.sendMessage(msg)    
+        self.instance.sendPreparedMessage(msg)    
 
