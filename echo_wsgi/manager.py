@@ -98,5 +98,6 @@ class Connection:
     def preparedData(self,msg):
         """发送消息
         """
-        self.instance.sendPreparedMessage(msg)    
+        self.instance.sendPreparedMessage(msg)  
+        print("prepared message sent to {}".format(self.instance.peer))  
 
