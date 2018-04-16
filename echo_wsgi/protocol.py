@@ -24,7 +24,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
         print "open" 
         connid=self.factory.connmanager.addConnection(self)  
         self.factory.register(self)
-        self.factory.connmanager.pushObjectbyconnID(json.dumps({"data":"servce say open"%connid,"connid":connid})) 
+        self.factory.connmanager.pushObjectbyconnID(json.dumps({"data":"servce say open %s"%(connid),"connid":connid})) 
         pass
 
     def onClose(self, wasClean, code, reason):
