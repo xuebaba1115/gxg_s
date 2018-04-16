@@ -120,3 +120,10 @@ if __name__ == "__main__":
     # reactor.listenSSL(9090, site, contextFactory)
     reactor.listenTCP(9090, site)
     reactor.run()
+
+
+
+
+#  curl -i -X POST -H "Content-Type: application/json" -d '{"username":"miguel","password":"python"}' http://127.0.0.1:5000/api/users
+#  curl -u miguel:python -i -X GET http://127.0.0.1:9090/api/resource
+

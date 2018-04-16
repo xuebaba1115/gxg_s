@@ -47,7 +47,19 @@ class ConnectionManager:
         if conn:
             conn.loseConnection()
 
-    def pushObject(self, msg):
+    def pushObjectall(self, msg):
+        """主动推送all消息
+        """
+        for target in self._connections:
+            print target,'target'
+            try:
+                conn = self.getConnectionByID(target)
+                if conn:
+                    conn.preparedData(msg)
+            except Exception, e:
+                log.err(str(e))
+
+    def pushObjectbyconnID(self, msg):
         """主动推送消息
         """
         for target in self._connections:
@@ -57,7 +69,9 @@ class ConnectionManager:
                 if conn:
                     conn.safeData(msg)
             except Exception, e:
-                log.err(str(e))
+                log.err(str(e))                
+
+
 
 class Connection:
     """
@@ -75,7 +89,14 @@ class Connection:
         """
         self.instance.transport.loseConnection()
 
+
     def safeData(self,msg):
         """发送消息
         """
-        self.instance.sendMessage(msg)
+        self.instance.sendMessage(msg)    
+
+    def preparedData(self,msg):
+        """发送消息
+        """
+        self.instance.sendMessage(msg)    
+

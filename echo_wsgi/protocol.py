@@ -11,7 +11,6 @@ from models import User
 class GxgServerProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
         print 'onconnect'
-        print request.headers
         print("Client connecting: {}".format(request.peer))                  
         tk=request.params
         if tk.get('token'):
@@ -36,9 +35,9 @@ class GxgServerProtocol(WebSocketServerProtocol):
 
     def connectionLost(self, reason):  
         print "connlost" 
-        self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
         self.factory.unregister(self)
-        WebSocketServerProtocol.connectionLost(self, reason)
+        self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
+        # WebSocketServerProtocol.connectionLost(self, reason)
         pass
 
     def onMessage(self, payload, isBinary):
@@ -69,9 +68,15 @@ class GxgServerFactory(WebSocketServerFactory):
             print("unregistered client {}".format(client.peer))
             self.clients.remove(client)
 
+    # def broadcast(self, msg):
+    #     print("broadcasting prepared message '{}' ..".format(msg))
+    #     preparedMsg = self.prepareMessage(msg)
+    #     for c in self.clients:
+    #         c.sendPreparedMessage(preparedMsg)
+    #         print("prepared message sent to {}".format(c.peer))
+
     def broadcast(self, msg):
         print("broadcasting prepared message '{}' ..".format(msg))
         preparedMsg = self.prepareMessage(msg)
-        for c in self.clients:
-            c.sendPreparedMessage(preparedMsg)
-            print("prepared message sent to {}".format(c.peer))
+        self.connmanager.pushObjectall(preparedMsg)
+  
