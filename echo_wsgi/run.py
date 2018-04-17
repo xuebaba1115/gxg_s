@@ -93,9 +93,9 @@ def get_auth_token():
 def wxauth():
     try:
         print request.headers
-        qcode=request.headers['constants.WX_HEADER_CODE']
-        encryptedData=request.headers['constants.WX_HEADER_ENCRYPTED_DATA']
-        iv=request.headers['constants.WX_HEADER_IV']
+        qcode=request.headers['X-WX-Code']
+        encryptedData=request.headers['X-WX-Encrypted-Data']
+        iv=request.headers['X-WX-IV']
     except Exception as e:
         log.msg(str(e))
         abort(400)
