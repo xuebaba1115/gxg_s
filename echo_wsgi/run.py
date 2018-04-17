@@ -105,7 +105,9 @@ def wxauth():
 # https://api.weixin.qq.com/sns/jscode2session?appid=wx4a6f0f1d44f64ca8&secret=09039f0ae70aca0a3096afc06c7a8872&js_code=071yR05z06Ctqf1TkK4z0p345z0yR05B&grant_type=authorization_code
     appId = app.config['WX_APPID']
     secret= app.config['WX_SECRET']
-    r=requests.get(u'https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s\&js_code=%s\&grant_type=authorization_code'%(appId,secret,qcode))
+    getsession = u'https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s\&js_code=%s\&grant_type=authorization_code'%(appId,secret,qcode)
+    print getsession
+    r=requests.get(getsession)
 
     print r.text
     print r.json()
