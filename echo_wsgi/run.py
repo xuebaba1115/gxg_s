@@ -112,7 +112,7 @@ def wxauth():
     print r.text
 
  
-    sessionkey=r.json()
+    sessionkey=r.text
     print sessionKey['session_key']
     pc = WXBizDataCrypt(appId, sessionKey['session_key'])
     print pc.decrypt(encryptedData, iv)
