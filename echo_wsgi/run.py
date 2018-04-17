@@ -28,7 +28,7 @@ app.secret_key = str(uuid.uuid4())
 
 
 #config
-app.config.from_object('config.py')
+app.config.from_object('config')
 app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
@@ -103,8 +103,8 @@ def wxauth():
 
 
 # https://api.weixin.qq.com/sns/jscode2session?appid=wx4a6f0f1d44f64ca8&secret=09039f0ae70aca0a3096afc06c7a8872&js_code=071yR05z06Ctqf1TkK4z0p345z0yR05B&grant_type=authorization_code
-    appId = app.config['WX-APPID']
-    secret= app.config['WX-SECRET']
+    appId = app.config['WX_APPID']
+    secret= app.config['WX_SECRET']
     r=requests.get('https://api.weixin.qq.com/sns/jscode2session?appid=%&secret=%s&js_code=%s&grant_type=authorization_code'%(appId,secret,qcode))
 
     sessionKey = 'tiihtNczf5v6AKRyjwEUhQ=='
