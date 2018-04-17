@@ -1,7 +1,7 @@
 import uuid
 import sys,os
 
-from run import app,db
+from run import db
 from models import User
 
 from flask import Flask,Blueprint, render_template,abort, request, jsonify, g, url_for
@@ -10,11 +10,22 @@ from flask_httpauth import HTTPBasicAuth
 
 
 
-
 auth = HTTPBasicAuth()
 
 
-userss = Blueprint('users', __name__,template_folder='templates')
+users = Blueprint('users', __name__,template_folder='templates')
+
+@auth.verify_password
+def verify_password(username_or_token, password):
+    # first try to authenticate by token
+    user = User.verify_auth_token(username_or_token)
+    if not user:
+        # try to authenticate with username/password
+        user = User.query.filter_by(username=username_or_token).first()
+        if not user or not user.verify_password(password):
+            return False
+    g.user = user
+    return True   
 
 @users.route('/')
 def page_home():
@@ -47,7 +58,7 @@ def get_resource():
     return jsonify({ 'data': 'Hello, %s!' % g.user.username })
 
 @users.route('/api/token')
-@users.login_required
+@auth.login_required
 def get_auth_token():
     token = g.user.generate_auth_token()
     return jsonify({ 'token': token.decode('ascii') })
