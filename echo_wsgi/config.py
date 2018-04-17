@@ -1,2 +1,0 @@
-WX_APPID = 'wx4a6f0f1d44f64ca8'
-WX_SECRET = '09039f0ae70aca0a3096afc06c7a8872'
