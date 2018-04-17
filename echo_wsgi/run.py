@@ -106,7 +106,6 @@ def wxauth():
     appId = app.config['WX_APPID']
     secret= app.config['WX_SECRET']
     getsession = u'https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code'%(appId,secret,qcode)
-    print getsession
     r=requests.get(getsession)
 
     print r.text
@@ -114,7 +113,7 @@ def wxauth():
  
     s=r.json()
     print s
-    ss=json.dumps(s)
+    ss=json.load(s)
     print ss
     print ss["openid"]
     print r.json()["openid"]
