@@ -115,7 +115,9 @@ def wxauth():
     s=r.json()
     print s
     ss=json.dumps(s)
-    print ss['openid']
+    print ss
+    print ss["openid"]
+    print r.json()["openid"]
 
     
     # pc = WXBizDataCrypt(appId, sessionKey)
