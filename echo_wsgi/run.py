@@ -110,10 +110,9 @@ def wxauth():
     r=requests.get(getsession)
 
     print r.text
-    print json.loads(r.json())['openid']
-    print json.loads(r.json())['session_key']
+
  
-    session_key=json.loads(r.json())['session_key']
+    session_key=r.json()['sessionkey']
     pc = WXBizDataCrypt(appId, sessionKey)
     print pc.decrypt(encryptedData, iv)
 
