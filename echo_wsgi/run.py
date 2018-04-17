@@ -108,7 +108,7 @@ def wxauth():
     getsession = u'https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code'%(appId,secret,qcode)
     r=requests.get(getsession)
     res = json.loads(r.text) 
-    session =res["session_key"]
+    sessionKey =res["session_key"]
     openid = res["openid"]
     
     pc = WXBizDataCrypt(appId, sessionKey)
