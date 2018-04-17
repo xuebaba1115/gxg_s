@@ -1,6 +1,6 @@
 import uuid
 import sys,os
-import requests
+import requests,json
 
 from utils import WXBizDataCrypt
 
@@ -110,11 +110,12 @@ def wxauth():
     r=requests.get(getsession)
 
     print r.text
-    print r.json()
+    print json.loads(r.json())['openid']
+    print json.loads(r.json())['session_key']
  
-
-    # pc = WXBizDataCrypt(appId, sessionKey)
-    # print pc.decrypt(encryptedData, iv)
+    session_key=json.loads(r.json())['session_key']
+    pc = WXBizDataCrypt(appId, sessionKey)
+    print pc.decrypt(encryptedData, iv)
 
     return "ssa"
 
