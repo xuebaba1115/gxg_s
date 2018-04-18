@@ -94,7 +94,7 @@ def wxauth():
         print getus.id
         print "cunzai############"
         print
-        abort(400)  # existing users
+        return "ssa"  # existing users
 
     pc = WXBizDataCrypt(appId, sessionKey)
     wx_user = pc.decrypt(encryptedData, iv)
