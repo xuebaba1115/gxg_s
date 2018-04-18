@@ -2,7 +2,9 @@ import base64
 import json
 from Crypto.Cipher import AES
 from passlib.apps import custom_app_context as pwd_context
-from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
+from itsdangerous import (
+    TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
+
 
 class WXBizDataCrypt:
     def __init__(self, appId, sessionKey):
@@ -25,12 +27,10 @@ class WXBizDataCrypt:
         return decrypted
 
     def _unpad(self, s):
-        return s[:-ord(s[len(s)-1:])]
+        return s[:-ord(s[len(s) - 1:])]
 
 
 class jm_jm(object):
-    def __init__(self, ss):
-        self.ssvi = ss
 
     @classmethod
     def hash_txt(self, txt):
@@ -40,18 +40,18 @@ class jm_jm(object):
     def verify_txt(self, txt):
         return pwd_context.verify(txt, self.password_hash)
 
-    @classmethod
-    def generate_auth_token(pwd,expiration=600):
-        s = Serializer('gxgamgv2', expires_in=expiration)
-        return s.dumps({'id': pwd})
 
-    @classmethod
-    def verify_auth_token(token):
-        s = Serializer('gxgamgv2')
-        try:
-            data = s.loads(token)
-        except SignatureExpired:
-            return None    # valid token, but expired
-        except BadSignature:
-            return None    # invalid token
-        return data
+def generate_auth_token(pwd, expiration=600):
+    s = Serializer("gxgamgv2", expires_in=expiration)
+    return s.dumps({'id':pwd})
+
+
+def verify_auth_token(token):
+    s = Serializer("gxgamgv2")
+    try:
+        data = s.loads(token)
+    except SignatureExpired:
+        return None    # valid token, but expired
+    except BadSignature:
+        return None    # invalid token
+    return data
