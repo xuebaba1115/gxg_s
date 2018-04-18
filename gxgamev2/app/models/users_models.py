@@ -1,6 +1,8 @@
 from passlib.apps import custom_app_context as pwd_context
-from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
+from itsdangerous import (
+    TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 from app import db
+
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -31,14 +33,13 @@ class User(db.Model):
         return user
 
 
-
 class WXUser(db.Model):
     __tablename__ = 'wxusers'
     id = db.Column(db.Integer, primary_key=True)
     openid = db.Column(db.String(32), index=True)
-    province = db.Column(db.String(32))    
-    city = db.Column(db.String(32)) 
-    avatarUrl = db.Column(db.String(64)) 
-    country = db.Column(db.String(32)) 
-    nickName =db.Column(db.String(32)) 
-    gender=db.Column(db.Integer)
+    province = db.Column(db.String(32))
+    city = db.Column(db.String(32))
+    avatarUrl = db.Column(db.String(64))
+    country = db.Column(db.String(32))
+    nickName = db.Column(db.String(32))
+    gender = db.Column(db.Integer)

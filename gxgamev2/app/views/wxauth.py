@@ -90,7 +90,8 @@ def wxauth():
     print wx_user
     
     wxuser = WXUser(openid=openid,province=wx_user['province'],city=wx_user['city'],avatarUrl=['avatarUrl'],country=['country'],nickName=['nickName'],gender=['gender'])
-    db.session.add(wx_user)
+    # wxuser
+    db.session.add(wxuser)
     db.session.commit()
 
 
