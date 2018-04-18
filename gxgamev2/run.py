@@ -16,8 +16,8 @@ from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
 if __name__ == "__main__":
 
 
-    if not os.path.exists('db.sqlite'):
-        db.create_all()
+    # if not os.path.exists('../db.sqlite'):
+    #     db.create_all()
 
     log.startLogging(sys.stdout)
 
