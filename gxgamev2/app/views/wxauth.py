@@ -81,7 +81,7 @@ def wxauth():
 
     if openid is None or sessionKey is None:
         abort(400) # missing arguments
-    if User.query.filter_by(openid = openid).first() is not None:
+    if User.query.filter_by(openid=openid).first() is not None:
         abort(400) # existing user    
     
     pc = WXBizDataCrypt(appId, sessionKey)
