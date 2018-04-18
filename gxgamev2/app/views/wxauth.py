@@ -92,8 +92,8 @@ def wxauth():
     getus = WXUser.query.filter_by(openid=openid).first()
     if getus is not None:
         print getus.id
+        print jm_jm.generate_auth_token(getus.id)
         print "cunzai############"
-        print
         return "ssa"  # existing users
 
     pc = WXBizDataCrypt(appId, sessionKey)
@@ -103,5 +103,8 @@ def wxauth():
                     country=wx_user['country'], nickName=wx_user['nickName'], gender=wx_user['gender'])
     db.session.add(wxuser)
     db.session.commit()
+    saveus = WXUser.query.filter_by(openid=openid).first()
+    print jm_jm.generate_auth_token(saveus.id)
+    print jm_jm.verify_auth_token(saveus.id)
 
     return "ssa"

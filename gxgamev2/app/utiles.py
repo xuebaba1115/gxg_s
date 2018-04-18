@@ -41,7 +41,7 @@ class jm_jm(object):
         return pwd_context.verify(txt, self.password_hash)
 
     @classmethod
-    def generate_auth_token(self, pwd,expiration=600):
+    def generate_auth_token(pwd,expiration=600):
         s = Serializer('gxgamgv2', expires_in=expiration)
         return s.dumps({'id': pwd})
 
