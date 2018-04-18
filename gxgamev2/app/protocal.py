@@ -25,7 +25,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
         connid = self.factory.connmanager.addConnection(self)
         self.factory.register(self)
         self.factory.connmanager.pushObjectbyconnID(json.dumps(
-            {"data": "servce say open %s" % (connid), "connid": connid}))
+            {"data": "servce say open %s" % (connid), "connid": connid,data:"self say"}))
         pass
 
     def onClose(self, wasClean, code, reason):
@@ -43,7 +43,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
 
     def onMessage(self, payload, isBinary):
         print payload
-        self.sendMessage(json.dumps(payload), isBinary)
+        self.sendMessage(json.dumps(payload))
 
 
 class GxgServerFactory(WebSocketServerFactory):
