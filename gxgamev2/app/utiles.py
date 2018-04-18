@@ -43,11 +43,11 @@ class jm_jm(object):
     @classmethod
     def generate_auth_token(pwd,expiration=600):
         s = Serializer('gxgamgv2', expires_in=expiration)
-        return s.dumps(pwd)
+        return s.dumps({'id': pwd})
 
     @classmethod
     def verify_auth_token(token):
-        s = Serializer('gxgamev2')
+        s = Serializer('gxgamgv2')
         try:
             data = s.loads(token)
         except SignatureExpired:
