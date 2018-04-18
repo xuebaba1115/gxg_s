@@ -42,6 +42,10 @@ class GxgServerProtocol(WebSocketServerProtocol):
         pass
 
     def onMessage(self, payload, isBinary):
+        if isBinary:
+            print("Binary message received: {0} bytes".format(len(payload)))
+        else:
+            print("Text message received: {0}".format(payload.decode('utf8')))
         print payload
         self.sendMessage(json.dumps(payload))
 
