@@ -79,7 +79,7 @@ def wxauth():
     sessionKey =res["session_key"]
     openid = res["openid"]
 
-    if openid is None or seeionkey is None:
+    if openid is None or sessionKey is None:
         abort(400) # missing arguments
     if User.query.filter_by(openid = openid).first() is not None:
         abort(400) # existing user    
