@@ -4,6 +4,7 @@ from flask import Flask,Blueprint, render_template,abort, request, jsonify, g, u
 from flask_httpauth import HTTPBasicAuth
 import requests,json
 from app.utiles import WXBizDataCrypt
+from twisted.python import log
 
 
 auth = HTTPBasicAuth()
