@@ -33,12 +33,12 @@ class jm_jm(object):
         self.ssvi = ss
 
     @classmethod
-    def hash_password(self, password):
-        self.password_hash = pwd_context.encrypt(password)
+    def hash_txt(self, txt):
+        self.password_hash = pwd_context.encrypt(txt)
 
     @classmethod
-    def verify_password(self, password):
-        return pwd_context.verify(password, self.password_hash)
+    def verify_txt(self, txt):
+        return pwd_context.verify(txt, self.password_hash)
 
     @classmethod
     def generate_auth_token(self, pwd,expiration=600):

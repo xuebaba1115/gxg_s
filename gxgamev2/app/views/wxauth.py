@@ -1,16 +1,18 @@
-from app import db,app
-from app.models.users_models import User,WXUser
-from flask import Flask,Blueprint, render_template,abort, request, jsonify, g, url_for
+from app import db, app
+from app.models.users_models import User, WXUser
+from flask import Flask, Blueprint, render_template, abort, request, jsonify, g, url_for
 from flask_httpauth import HTTPBasicAuth
-import requests,json
-from app.utiles import WXBizDataCrypt
+import requests
+import json
+from app.utiles import WXBizDataCrypt, jm_jm
 from twisted.python import log
 
 
 auth = HTTPBasicAuth()
 
 
-users = Blueprint('users', __name__,template_folder='templates')
+users = Blueprint('users', __name__, template_folder='templates')
+
 
 @auth.verify_password
 def verify_password(username_or_token, password):
@@ -22,25 +24,28 @@ def verify_password(username_or_token, password):
         if not user or not user.verify_password(password):
             return False
     g.user = user
-    return True   
+    return True
+
 
 @users.route('/')
 def page_home():
     return render_template('index.html')
 
-@users.route('/api/users', methods = ['POST'])
+
+@users.route('/api/users', methods=['POST'])
 def new_user():
     username = request.json.get('username')
     password = request.json.get('password')
     if username is None or password is None:
-        abort(400) # missing arguments
-    if User.query.filter_by(username = username).first() is not None:
-        abort(400) # existing user
-    user = User(username = username)
+        abort(400)  # missing arguments
+    if User.query.filter_by(username=username).first() is not None:
+        abort(400)  # existing user
+    user = User(username=username)
     user.hash_password(password)
     db.session.add(user)
     db.session.commit()
-    return jsonify({ 'username': user.username })
+    return jsonify({'username': user.username})
+
 
 @users.route('/api/users/<int:id>')
 def get_user(id):
@@ -49,50 +54,54 @@ def get_user(id):
         abort(400)
     return jsonify({'username': user.username})
 
+
 @users.route('/api/resource')
 @auth.login_required
 def get_resource():
-    return jsonify({ 'data': 'Hello, %s!' % g.user.username })
+    return jsonify({'data': 'Hello, %s!' % g.user.username})
+
 
 @users.route('/api/token')
 @auth.login_required
 def get_auth_token():
     token = g.user.generate_auth_token()
-    return jsonify({ 'token': token.decode('ascii') })
+    return jsonify({'token': token.decode('ascii')})
 
 
 @users.route('/api/wxauth')
 def wxauth():
     try:
-        qcode=request.headers['X-WX-Code']
-        encryptedData=request.headers['X-WX-Encrypted-Data']
-        iv=request.headers['X-WX-IV']
+        qcode = request.headers['X-WX-Code']
+        encryptedData = request.headers['X-WX-Encrypted-Data']
+        iv = request.headers['X-WX-IV']
     except Exception as e:
         log.msg(str(e))
         abort(400)
 
-
     appId = app.config['WX_APPID']
-    secret= app.config['WX_SECRET']
-    getsession = u'https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code'%(appId,secret,qcode)
-    r=requests.get(getsession)
-    res = json.loads(r.text) 
-    sessionKey =res["session_key"]
+    secret = app.config['WX_SECRET']
+    getsession = u'https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code' % (
+        appId, secret, qcode)
+    r = requests.get(getsession)
+    res = json.loads(r.text)
+    sessionKey = res["session_key"]
     openid = res["openid"]
 
     if openid is None or sessionKey is None:
-        abort(400) # missing arguments
-    # if User.query.filter_by(openid=openid).first() is not None:
-    #     abort(400) # existing users    
-    
+        abort(400)  # missing arguments
+    getus = WXUser.query.filter_by(openid=openid).first()
+    if getus is not None:
+        print getus.id
+        print "cunzai############"
+        print
+        abort(400)  # existing users
+
     pc = WXBizDataCrypt(appId, sessionKey)
     wx_user = pc.decrypt(encryptedData, iv)
-    print wx_user
-    
-    wxuser = WXUser(openid=openid,province=wx_user['province'],city=wx_user['city'],avatarUrl=wx_user['avatarUrl'],country=wx_user['country'],nickName=wx_user['nickName'],gender=wx_user['gender'])
-    # wxuser
+
+    wxuser = WXUser(openid=openid, province=wx_user['province'], city=wx_user['city'], avatarUrl=wx_user['avatarUrl'],
+                    country=wx_user['country'], nickName=wx_user['nickName'], gender=wx_user['gender'])
     db.session.add(wxuser)
     db.session.commit()
-
 
     return "ssa"
