@@ -46,8 +46,10 @@ class GxgServerProtocol(WebSocketServerProtocol):
             print("Binary message received: {0} bytes".format(len(payload)))
         else:
             print("Text message received: {0}".format(payload.decode('utf8')))
-        print payload
-        self.sendMessage(json.dumps(payload.decode('utf8')))
+        print json.loads(payload)
+        a=json.loads(payload)
+        print json.dumps(a)
+        self.sendMessage(json.dumps(a))
 
 
 class GxgServerFactory(WebSocketServerFactory):
