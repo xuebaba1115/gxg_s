@@ -88,8 +88,9 @@ def wxauth():
     pc = WXBizDataCrypt(appId, sessionKey)
     wx_user = pc.decrypt(encryptedData, iv)
     print wx_user
+    print 
     
-    wxuser = WXUser(openid=openid,province=wx_user['province'],city=wx_user['city'],avatarUrl=['avatarUrl'],country=['country'],nickName=['nickName'],gender=['gender'])
+    wxuser = WXUser(openid=openid,province=wx_user['province'],city=wx_user['city'],avatarUrl=wx_user['avatarUrl'],country=wx_user['country'],nickName=wx_user['nickName'],gender=wx_user['gender'])
     # wxuser
     db.session.add(wxuser)
     db.session.commit()
