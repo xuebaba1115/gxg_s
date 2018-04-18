@@ -92,8 +92,8 @@ def wxauth():
     getus = WXUser.query.filter_by(openid=openid).first()
     if getus is not None:
         token = generate_auth_token(getus.id)
-        # return jsonify({'token': token.decode('ascii')})
-        return "ssa"  # existing users
+        return jsonify(token=token.decode('ascii'),nickName=getus.nickName,gender=getus.gender)
+        # return "ssa"  # existing users
 
     pc = WXBizDataCrypt(appId, sessionKey)
     wx_user = pc.decrypt(encryptedData, iv)
@@ -104,6 +104,6 @@ def wxauth():
     db.session.commit()
     saveus = WXUser.query.filter_by(openid=openid).first()
     token = generate_auth_token(saveus.id)
-    # return jsonify({'token': token.decode('ascii')})
+    return jsonify(token=token.decode('ascii'),nickName=wx_user['nickName'],gender=wx_user['gender'])
 
-    return "ssa"
+   
