@@ -1,17 +1,16 @@
-import os,sys
-from app import app,db
-from app.protocal import GxgServerFactory,GxgServerProtocol
-
+import os
+import sys
+from app import app, db
+from app.protocal import GxgServerFactory, GxgServerProtocol
 
 
 from twisted.python import log
-from twisted.internet import reactor,ssl
+from twisted.internet import reactor, ssl
 from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
 from autobahn.twisted.websocket import WebSocketServerFactory, \
-    WebSocketServerProtocol,listenWS
+    WebSocketServerProtocol, listenWS
 from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
-
 
 
 if __name__ == "__main__":
@@ -38,7 +37,7 @@ if __name__ == "__main__":
 
     # create a Twisted Web Site and run everything
     site = Site(rootResource)
-    
+
     # reactor.listenSSL(9090, site, contextFactory)
     reactor.listenTCP(9090, site)
     reactor.run()

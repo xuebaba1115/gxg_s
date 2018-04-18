@@ -1,8 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import uuid
-import sys,os
-
+import sys
+import os
 
 
 app = Flask(__name__)
@@ -15,12 +15,8 @@ app.config['SQLALCHEMY_ECHO'] = True
 app.secret_key = str(uuid.uuid4())
 
 
-db = SQLAlchemy(app) 
+db = SQLAlchemy(app)
 
 
- 
 from .views import register_blueprints
 register_blueprints(app)
-
-
- 

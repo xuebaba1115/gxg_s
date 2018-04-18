@@ -4,7 +4,7 @@ from flask import Flask, Blueprint, render_template, abort, request, jsonify, g,
 from flask_httpauth import HTTPBasicAuth
 import requests
 import json
-from app.utiles import WXBizDataCrypt, jm_jm,verify_auth_token,generate_auth_token
+from app.utiles import WXBizDataCrypt, jm_jm, verify_auth_token, generate_auth_token
 from twisted.python import log
 
 
@@ -91,9 +91,8 @@ def wxauth():
         abort(400)  # missing arguments
     getus = WXUser.query.filter_by(openid=openid).first()
     if getus is not None:
-        print getus.id
-        print generate_auth_token(getus.id)
-        print "cunzai############"
+        token = generate_auth_token(getus.id)
+        # return jsonify({'token': token.decode('ascii')})
         return "ssa"  # existing users
 
     pc = WXBizDataCrypt(appId, sessionKey)
@@ -104,10 +103,7 @@ def wxauth():
     db.session.add(wxuser)
     db.session.commit()
     saveus = WXUser.query.filter_by(openid=openid).first()
-    mimi=generate_auth_token(saveus.id)
-    print verify_auth_token(mimi)
-
+    token = generate_auth_token(saveus.id)
+    # return jsonify({'token': token.decode('ascii')})
 
     return "ssa"
-
-
