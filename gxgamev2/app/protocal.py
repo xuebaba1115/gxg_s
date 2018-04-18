@@ -42,6 +42,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
         pass
 
     def onMessage(self, payload, isBinary):
+        print payload
         self.sendMessage(payload, isBinary)
 
 
