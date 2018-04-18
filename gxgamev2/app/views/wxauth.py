@@ -71,6 +71,7 @@ def wxauth():
         log.msg(str(e))
         abort(400)
 
+
     appId = app.config['WX_APPID']
     secret= app.config['WX_SECRET']
     getsession = u'https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code'%(appId,secret,qcode)
@@ -82,7 +83,7 @@ def wxauth():
     if openid is None or sessionKey is None:
         abort(400) # missing arguments
     # if User.query.filter_by(openid=openid).first() is not None:
-    #     abort(400) # existing user    
+    #     abort(400) # existing users    
     
     pc = WXBizDataCrypt(appId, sessionKey)
     wx_user = pc.decrypt(encryptedData, iv)
