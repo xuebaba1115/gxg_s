@@ -41,7 +41,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
         # WebSocketServerProtocol.connectionLost(self, reason)
         pass
 
-    def onMessage(self, payload):
+    def onMessage(self, payload, isBinary):
         print payload
         self.sendMessage(json.dumps(payload))
 
