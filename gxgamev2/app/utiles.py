@@ -43,7 +43,7 @@ class jm_jm(object):
     @classmethod
     def generate_auth_token(pwd,expiration=600):
         s = Serializer('gxgamgv2', expires_in=expiration)
-        return s.dumps({'id': pwd})
+        return s.dumps(pwd)
 
     @classmethod
     def verify_auth_token(token):
