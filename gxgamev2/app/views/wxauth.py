@@ -1,5 +1,5 @@
 from app import db,app
-from app.models.users_models import User
+from app.models.users_models import User,WXUser
 from flask import Flask,Blueprint, render_template,abort, request, jsonify, g, url_for
 from flask_httpauth import HTTPBasicAuth
 import requests,json
@@ -78,8 +78,19 @@ def wxauth():
     res = json.loads(r.text) 
     sessionKey =res["session_key"]
     openid = res["openid"]
+
+    if openid is None or seeionkey is None:
+        abort(400) # missing arguments
+    if User.query.filter_by(openid = openid).first() is not None:
+        abort(400) # existing user    
     
     pc = WXBizDataCrypt(appId, sessionKey)
-    print pc.decrypt(encryptedData, iv)
+    wx_user = pc.decrypt(encryptedData, iv)
+    print wx_user
+    
+    wxuser = WXUser(openid=openid,province=wx_user['province'],city=wx_user['city'],avatarUrl=['avatarUrl'],country=['country'],nickName=['nickName'],gender=['gender'])
+    db.session.add(wx_user)
+    db.session.commit()
+
 
     return "ssa"

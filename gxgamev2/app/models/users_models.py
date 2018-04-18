@@ -15,12 +15,12 @@ class User(db.Model):
         return pwd_context.verify(password, self.password_hash)
 
     def generate_auth_token(self, expiration=600):
-        s = Serializer('adasd', expires_in=expiration)
+        s = Serializer('gxgamgv2', expires_in=expiration)
         return s.dumps({'id': self.id})
 
     @staticmethod
     def verify_auth_token(token):
-        s = Serializer('adasd')
+        s = Serializer('gxgamev2')
         try:
             data = s.loads(token)
         except SignatureExpired:
@@ -29,3 +29,16 @@ class User(db.Model):
             return None    # invalid token
         user = User.query.get(data['id'])
         return user
+
+
+
+class WXUser(db.Model):
+    __tablename__ = 'wxusers'
+    id = db.Column(db.Integer, primary_key=True)
+    openid = db.Column(db.String(32), index=True)
+    province = db.Column(db.String(32))    
+    city = db.Column(db.String(32)) 
+    avatarUrl = db.Column(db.String(64)) 
+    country = db.Column(db.String(32)) 
+    nickName =db.Column(db.String(32)) 
+    gender=db.Column(db.Integer)
