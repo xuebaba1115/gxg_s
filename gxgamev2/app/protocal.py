@@ -1,10 +1,13 @@
 import json
+from app.utiles import verify_auth_token
 from manager import ConnectionManager
 from twisted.internet import reactor
 from autobahn.twisted.websocket import WebSocketServerFactory, \
     WebSocketServerProtocol, listenWS
+from twisted.internet.defer import Deferred, \
+    inlineCallbacks, returnValue    
 
-from app.utiles import verify_auth_token
+
 
 
 # Our WebSocket Server protocol
@@ -13,12 +16,12 @@ class GxgServerProtocol(WebSocketServerProtocol):
         print 'onconnect'
         print("Client connecting: {}".format(request.peer))
         tk = request.params
-        if tk.get('token'):
-            youhu = verify_auth_token(tk['token'].pop())
-            if not youhu:
-                self.dropConnection(abort=True)
-        else:
-            self.dropConnection(abort=True)
+        # if tk.get('token'):
+        #     youhu = verify_auth_token(tk['token'].pop())
+        #     if not youhu:
+        #         self.dropConnection(abort=True)
+        # else:
+        #     self.dropConnection(abort=True)
 
     def onOpen(self):
         print "open"
@@ -42,14 +45,16 @@ class GxgServerProtocol(WebSocketServerProtocol):
         pass
 
     def onMessage(self, payload, isBinary):
-        if isBinary:
-            print("Binary message received: {0} bytes".format(len(payload)))
-        else:
-            print("Text message received: {0}".format(payload.decode('utf8')))
-        print json.loads(payload)
-        a=json.loads(payload)
-        print json.dumps(a)
-        self.sendMessage(json.dumps(a))
+        if not isBinary:
+            try:
+                x = json.loads(payload.decode('utf8'))
+                self.sendMessage(json.dumps(x).encode('utf8')) 
+            except Exception as e:     
+                self.sendMessage(json.dumps(payload).encode('utf8'))         
+                self.sendClose(1000, u"Exception raised: {0}".format(e))                             
+                pass
+    
+
 
 
 class GxgServerFactory(WebSocketServerFactory):
@@ -66,7 +71,7 @@ class GxgServerFactory(WebSocketServerFactory):
         self.tickcount += 1
         self.broadcast(json.dumps(
             {"data": "tick %d from server" % self.tickcount}))
-        reactor.callLater(60, self.tick)
+        reactor.callLater(0.01, self.tick)
 
     def register(self, client):
         if client not in self.clients:
