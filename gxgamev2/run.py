@@ -5,7 +5,6 @@ from app.protocal import GxgServerFactory, GxgServerProtocol
 
 
 from twisted.python import log
-from twisted.internet import reactor, ssl
 from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
 from autobahn.twisted.websocket import WebSocketServerFactory, \
@@ -14,6 +13,7 @@ from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
 
 
 if __name__ == "__main__":
+    from twisted.internet import reactor, ssl
     # if not os.path.exists('../db.sqlite'):
     #     db.create_all()
     log.startLogging(sys.stdout)

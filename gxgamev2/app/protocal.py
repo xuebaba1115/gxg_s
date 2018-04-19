@@ -71,7 +71,7 @@ class GxgServerFactory(WebSocketServerFactory):
         self.tickcount += 1
         self.broadcast(json.dumps(
             {"data": "tick %d from server" % self.tickcount}))
-        reactor.callLater(0.01, self.tick)
+        reactor.callLater(60, self.tick)
 
     def register(self, client):
         if client not in self.clients:
