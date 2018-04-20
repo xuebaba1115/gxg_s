@@ -50,8 +50,8 @@ class GxgServerProtocol(WebSocketServerProtocol):
     def onMessage(self, payload, isBinary):
         if not isBinary:
             try:
-                x = json.loads(payload.decode('utf8'))
-                print x
+                x = json.loads(payload.decode('utf8'))                
+                print "onmessage"+x
                 self.factory.gamemanger_A.handledata(x)
                 # self.sendMessage(json.dumps(x).encode('utf8'))
             except Exception as e:
@@ -71,8 +71,8 @@ class GxgServerFactory(WebSocketServerFactory):
     def tick(self):
         sendlist, msg = self.gamemanger_A.getallpopleinfo()
         print sendlist,msg
-        self.broadcast(json.dumps(msg), sendlist)
-        reactor.callLater(15, self.tick)
+        self.broadcast(json.dumps(msg).encode('utf8'), sendlist)
+        reactor.callLater(5, self.tick)
 
     def broadcast(self, msg, sendlist):
         print("broadcasting prepared message '{}' ..".format(msg))
