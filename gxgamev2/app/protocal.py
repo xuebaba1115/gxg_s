@@ -11,7 +11,7 @@ from twisted.internet.defer import Deferred, \
 
 import sys
 reload(sys)
-sys.setdefaultencoding('utf-8')    
+sys.setdefaultencoding('utf-8')
 
 
 # Our WebSocket Server protocol
@@ -30,34 +30,31 @@ class GxgServerProtocol(WebSocketServerProtocol):
     def onOpen(self):
         print "open"
         connid = self.factory.connmanager.addConnection(self)
-        self.factory.connmanager.pushObjectbyconnID(
-            {"data": "servce say open %s" % (connid), "connid": connid, "command": "init", "x": connid, "y": connid, "name": "name%s" % connid},[connid])
-
+        self.factory.connmanager.pushObjectbyconnID(json.dumps({"data": "servce say open %s" % (
+            connid), "connid": connid, "command": "init", "x": connid, "y": connid, "name": "name%s" % connid}).encode('utf8'), [connid])
 
     def onClose(self, wasClean, code, reason):
         print "onclose"
-        self.factory.gamemanger_A.unregister(self.transport.sessionno)        
+        self.factory.gamemanger_A.unregister(self.transport.sessionno)
         self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
-   
 
     def connectionLost(self, reason):
         print "connlost"
         self.factory.gamemanger_A.unregister(self.transport.sessionno)
         self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
         # WebSocketServerProtocol.connectionLost(self, reason)
-  
 
     def onMessage(self, payload, isBinary):
         if not isBinary:
             try:
-                x = json.loads(payload.decode('utf8'))                
+                x = json.loads(payload.decode('utf8'))
                 print "onmessage"+x
                 self.factory.gamemanger_A.handledata(x)
                 # self.sendMessage(json.dumps(x).encode('utf8'))
             except Exception as e:
                 self.sendMessage(json.dumps(payload).encode('utf8'))
                 self.sendClose(1000, u"Exception raised: {0}".format(e))
-             
+
 
 class GxgServerFactory(WebSocketServerFactory):
     protocol = GxgServerProtocol
@@ -70,14 +67,14 @@ class GxgServerFactory(WebSocketServerFactory):
 
     def tick(self):
         sendlist, msg = self.gamemanger_A.getallpopleinfo()
-        print sendlist,msg
+        print sendlist, msg
         self.broadcast(json.dumps(msg).encode('utf8'), sendlist)
         reactor.callLater(5, self.tick)
 
     def broadcast(self, msg, sendlist):
         print("broadcasting prepared message '{}' ..".format(msg))
         preparedMsg = self.prepareMessage(msg)
-        self.connmanager.pushObjectbyconnIDlist(preparedMsg,sendlist)
+        self.connmanager.pushObjectbyconnIDlist(preparedMsg, sendlist)
 
         # self.clients = []
         # self.tickcount = 0
