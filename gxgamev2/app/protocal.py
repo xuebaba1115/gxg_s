@@ -72,7 +72,7 @@ class GxgServerFactory(WebSocketServerFactory):
         sendlist, msg = self.gamemanger_A.getallpopleinfo()
         print sendlist,msg
         self.broadcast(json.dumps(msg), sendlist)
-        reactor.callLater(0.1, self.tick)
+        reactor.callLater(60, self.tick)
 
     def broadcast(self, msg, sendlist):
         print("broadcasting prepared message '{}' ..".format(msg))
