@@ -19,7 +19,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
         print 'onconnect'
         print("Client connecting: {}".format(request.peer))
-        tk = request.peer
+        tk = request.params
         if tk.get('token'):
             youhu = verify_auth_token(tk['token'].pop())
             if not youhu:
@@ -72,7 +72,7 @@ class GxgServerFactory(WebSocketServerFactory):
         sendlist, msg = self.gamemanger_A.getallpopleinfo()
         print sendlist,msg
         self.broadcast(json.dumps(msg), sendlist)
-        reactor.callLater(60, self.tick)
+        reactor.callLater(15, self.tick)
 
     def broadcast(self, msg, sendlist):
         print("broadcasting prepared message '{}' ..".format(msg))
