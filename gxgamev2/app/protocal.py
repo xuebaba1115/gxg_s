@@ -20,18 +20,18 @@ class GxgServerProtocol(WebSocketServerProtocol):
         print 'onconnect'
         print("Client connecting: {}".format(request.peer))
         tk = request.params
-        # if tk.get('token'):
-        #     youhu = verify_auth_token(tk['token'].pop())
-        #     if not youhu:
-        #         self.dropConnection(abort=True)
-        # else:
-        #     self.dropConnection(abort=True)
+        if tk.get('token'):
+            youhu = verify_auth_token(tk['token'].pop())
+            if not youhu:
+                self.dropConnection(abort=True)
+        else:
+            self.dropConnection(abort=True)
 
     def onOpen(self):
         print "open"
         connid = self.factory.connmanager.addConnection(self)
-        self.factory.connmanager.pushObjectbyconnID(json.dumps(
-            {"data": "servce say open %s" % (connid), "connid": connid, "command": "init", "x": connid, "y": connid, "name": "name%s" % connid}),[connid])
+        self.factory.connmanager.pushObjectbyconnID(
+            {"data": "servce say open %s" % (connid), "connid": connid, "command": "init", "x": connid, "y": connid, "name": "name%s" % connid},[connid])
 
 
     def onClose(self, wasClean, code, reason):
@@ -76,7 +76,7 @@ class GxgServerFactory(WebSocketServerFactory):
 
     def broadcast(self, msg, sendlist):
         print("broadcasting prepared message '{}' ..".format(msg))
-        preparedMsg = self.prepareMessage(json.dumps(msg).encode('utf8'))
+        preparedMsg = self.prepareMessage(msg)
         self.connmanager.pushObjectbyconnIDlist(preparedMsg,sendlist)
 
         # self.clients = []

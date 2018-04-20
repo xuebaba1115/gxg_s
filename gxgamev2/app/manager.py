@@ -1,6 +1,7 @@
 # coding:utf8
 from twisted.python import log
 from autobahn.twisted.websocket import protocol
+import json
 
 
 class ConnectionManager:
@@ -103,7 +104,7 @@ class Connection:
     def safeData(self, msg):
         """发送消息
         """
-        self.instance.sendMessage(msg)
+        self.instance.sendMessage(json.dumps(msg).encode('utf8'))
 
     def preparedData(self, msg):
         """发送消息

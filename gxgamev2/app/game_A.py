@@ -30,7 +30,7 @@ class Gamemanger(object):
         for p in self.clients.values():
             _data.append({"connid": p.connid, "x": p.x, "y": p.y,"name":p.name})
             _cid.append(p.connid)
-        return _cid, {"data": _data}
+        return _cid, {"status":0,"data": _data}
 
     def handledata(self, json_data):
         print "handle"
