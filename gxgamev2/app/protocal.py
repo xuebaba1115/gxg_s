@@ -20,12 +20,12 @@ class GxgServerProtocol(WebSocketServerProtocol):
         print 'onconnect'
         print("Client connecting: {}".format(request.peer))
         tk = request.params
-        if tk.get('token'):
-            youhu = verify_auth_token(tk['token'].pop())
-            if not youhu:
-                self.dropConnection(abort=True)
-        else:
-            self.dropConnection(abort=True)
+        # if tk.get('token'):
+        #     youhu = verify_auth_token(tk['token'].pop())
+        #     if not youhu:
+        #         self.dropConnection(abort=True)
+        # else:
+        #     self.dropConnection(abort=True)
 
     def onOpen(self):
         print "open"
@@ -76,7 +76,7 @@ class GxgServerFactory(WebSocketServerFactory):
 
     def broadcast(self, msg, sendlist):
         print("broadcasting prepared message '{}' ..".format(msg))
-        preparedMsg = self.prepareMessage(msg)
+        preparedMsg = self.prepareMessage(json.dumps(msg).encode('utf8'))
         self.connmanager.pushObjectbyconnIDlist(preparedMsg,sendlist)
 
         # self.clients = []
