@@ -1,5 +1,6 @@
-#coding:utf8
+# coding:utf8
 from twisted.python import log
+
 
 class ConnectionManager:
     """ 连接管理器
@@ -52,7 +53,20 @@ class ConnectionManager:
         """主动推送all消息
         """
         for target in self._connections:
-            print target,'target'
+            print target, 'target'
+            try:
+                conn = self.getConnectionByID(target)
+                if conn:
+                    conn.preparedData(msg)
+            except Exception, e:
+                log.err(str(e))
+
+    def pushObjectbyconnIDlist(self, msg, sendlist):
+        """主动推送消息list
+        """
+
+        for target in sendlist:
+            print target, 'target'
             try:
                 conn = self.getConnectionByID(target)
                 if conn:
@@ -61,22 +75,22 @@ class ConnectionManager:
                 log.err(str(e))
 
     def pushObjectbyconnID(self, msg):
-        """主动推送消息
+        """主动推送消息connid
         """
         for target in self._connections:
-            print target,'target'
+            print target, 'target'
             try:
                 conn = self.getConnectionByID(target)
                 if conn:
                     conn.safeData(msg)
             except Exception, e:
-                log.err(str(e))                
-
+                log.err(str(e))
 
 
 class Connection:
     """
     """
+
     def __init__(self, _conn):
         """
         id 连接的ID
@@ -90,15 +104,13 @@ class Connection:
         """
         self.instance.transport.loseConnection()
 
-
-    def safeData(self,msg):
+    def safeData(self, msg):
         """发送消息
         """
-        self.instance.sendMessage(msg)    
+        self.instance.sendMessage(msg)
 
-    def preparedData(self,msg):
+    def preparedData(self, msg):
         """发送消息
         """
-        self.instance.sendPreparedMessage(msg)  
-        print("prepared message sent to {}".format(self.instance.peer))  
-
+        self.instance.sendPreparedMessage(msg)
+        print("prepared message sent to {}".format(self.instance.peer))

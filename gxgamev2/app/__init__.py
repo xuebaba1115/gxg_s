@@ -10,10 +10,10 @@ app = Flask(__name__)
 app.config.from_object('app.config')
 app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////%s/db.sqlite'%(abs)
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite' (win)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite' (windows)
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-app.config['SQLALCHEMY_ECHO'] = True
+# app.config['SQLALCHEMY_ECHO'] = True
 app.secret_key = str(uuid.uuid4())
 
 
