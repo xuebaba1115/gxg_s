@@ -1,3 +1,4 @@
+# coding:utf8
 import json
 from app.utiles import verify_auth_token
 from manager import ConnectionManager
@@ -19,18 +20,18 @@ class GxgServerProtocol(WebSocketServerProtocol):
         print 'onconnect'
         print("Client connecting: {}".format(request.peer))
         tk = request.peer
-        # if tk.get('token'):
-        #     youhu = verify_auth_token(tk['token'].pop())
-        #     if not youhu:
-        #         self.dropConnection(abort=True)
-        # else:
-        #     self.dropConnection(abort=True)
+        if tk.get('token'):
+            youhu = verify_auth_token(tk['token'].pop())
+            if not youhu:
+                self.dropConnection(abort=True)
+        else:
+            self.dropConnection(abort=True)
 
     def onOpen(self):
         print "open"
         connid = self.factory.connmanager.addConnection(self)
         self.factory.connmanager.pushObjectbyconnID(json.dumps(
-            {"data": "servce say open %s" % (connid), "connid": connid, "command": "init", "x": connid, "y": connid, "name": "name%s" % connid}))
+            {"data": "servce say open %s" % (connid), "connid": connid, "command": "init", "x": connid, "y": connid, "name": "name%s" % connid}),[connid])
 
 
     def onClose(self, wasClean, code, reason):
@@ -71,7 +72,7 @@ class GxgServerFactory(WebSocketServerFactory):
         sendlist, msg = self.gamemanger_A.getallpopleinfo()
         print sendlist,msg
         self.broadcast(json.dumps(msg), sendlist)
-        reactor.callLater(10, self.tick)
+        reactor.callLater(0.1, self.tick)
 
     def broadcast(self, msg, sendlist):
         print("broadcasting prepared message '{}' ..".format(msg))

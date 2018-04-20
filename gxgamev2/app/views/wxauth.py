@@ -1,3 +1,4 @@
+# coding:utf8
 from app import db, app
 from app.models.users_models import User, WXUser
 from flask import Flask, Blueprint, render_template, abort, request, jsonify, g, url_for

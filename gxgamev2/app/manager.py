@@ -1,5 +1,6 @@
 # coding:utf8
 from twisted.python import log
+from autobahn.twisted.websocket import protocol
 
 
 class ConnectionManager:
@@ -63,7 +64,6 @@ class ConnectionManager:
     def pushObjectbyconnIDlist(self, msg, sendlist):
         """主动推送消息list
         """
-
         for target in sendlist:
             try:
                 conn = self.getConnectionByID(target)
@@ -72,10 +72,10 @@ class ConnectionManager:
             except Exception, e:
                 log.err(str(e))
 
-    def pushObjectbyconnID(self, msg):
+    def pushObjectbyconnID(self, msg,idlist):
         """主动推送消息connid
         """
-        for target in self._connections:
+        for target in idlist:
             try:
                 conn = self.getConnectionByID(target)
                 if conn:
