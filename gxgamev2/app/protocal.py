@@ -8,6 +8,10 @@ from autobahn.twisted.websocket import WebSocketServerFactory, \
 from twisted.internet.defer import Deferred, \
     inlineCallbacks, returnValue
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')    
+
 
 # Our WebSocket Server protocol
 class GxgServerProtocol(WebSocketServerProtocol):
@@ -27,19 +31,20 @@ class GxgServerProtocol(WebSocketServerProtocol):
         connid = self.factory.connmanager.addConnection(self)
         self.factory.connmanager.pushObjectbyconnID(json.dumps(
             {"data": "servce say open %s" % (connid), "connid": connid, "command": "init", "x": connid, "y": connid, "name": "name%s" % connid}))
-        pass
+
 
     def onClose(self, wasClean, code, reason):
         print "onclose"
+        self.factory.gamemanger_A.unregister(self.transport.sessionno)        
         self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
-        pass
+   
 
     def connectionLost(self, reason):
         print "connlost"
-
+        self.factory.gamemanger_A.unregister(self.transport.sessionno)
         self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
         # WebSocketServerProtocol.connectionLost(self, reason)
-        pass
+  
 
     def onMessage(self, payload, isBinary):
         if not isBinary:
@@ -47,13 +52,11 @@ class GxgServerProtocol(WebSocketServerProtocol):
                 x = json.loads(payload.decode('utf8'))
                 print x
                 self.factory.gamemanger_A.handledata(x)
-
                 # self.sendMessage(json.dumps(x).encode('utf8'))
             except Exception as e:
                 self.sendMessage(json.dumps(payload).encode('utf8'))
                 self.sendClose(1000, u"Exception raised: {0}".format(e))
-                pass
-
+             
 
 class GxgServerFactory(WebSocketServerFactory):
     protocol = GxgServerProtocol

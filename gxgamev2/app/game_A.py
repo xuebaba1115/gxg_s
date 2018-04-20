@@ -1,51 +1,40 @@
 # coding:utf8
+from twisted.python import log
 from twisted.internet import reactor
 import json
 
 
 class Gamemanger(object):
-    clients = []
-    _pss = []
+    clients = {}
 
     def __init__(self):
         self.tickcount = 0
 
-    def register(self, client):
-        if client not in self.clients:
-            print("registered client ")
-            self.clients.append(client)
-            print self.clients
-
     def unregister(self, client):
-        if client in self.clients:
-            print("unregistered client ")
-            self.clients.remove(client)
+        try:
+            del self.clients[client]
+        except Exception as e:
+            log.msg(str(e))
 
-    def initpople(self, json_data):
-        print "initpople"
+    def register(self, json_data):
+        print "register"
         _ps = pople(json_data["name"], json_data["x"],
-                         json_data["y"], json_data["connid"])
-        if _ps in self._pss:
+                    json_data["y"], json_data["connid"])
+        if _ps.connid in self.clients:
             raise Exception("系统记录冲突")
-        self._pss.append(_ps)     
-        print self._pss                             
+        self.clients[_ps.connid] = _ps
 
     def getallpopleinfo(self):
-        _data=[]
-        for p in self._pss:
-            _data.append({"connid":p.connid,"x":p.x,"y":p.y})
-        return self.clients,{"data":_data}            
-            # p.connid
-            # p.name
-            # p.x
-            # p.y
-            
+        _data = []
+        _cid = []
+        for p in self.clients.values():
+            _data.append({"connid": p.connid, "x": p.x, "y": p.y,"name":p.name})
+            _cid.append(p.connid)
+        return _cid, {"data": _data}
 
     def handledata(self, json_data):
-        print json_data["command"]
-        print json_data["connid"]
-        self.register(json_data["connid"])
-        self.initpople(json_data)
+        print "handle"
+        self.register(json_data)
 
 
 class pople(object):

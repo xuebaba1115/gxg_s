@@ -53,7 +53,6 @@ class ConnectionManager:
         """主动推送all消息
         """
         for target in self._connections:
-            print target, 'target'
             try:
                 conn = self.getConnectionByID(target)
                 if conn:
@@ -66,7 +65,6 @@ class ConnectionManager:
         """
 
         for target in sendlist:
-            print target, 'target'
             try:
                 conn = self.getConnectionByID(target)
                 if conn:
@@ -78,7 +76,6 @@ class ConnectionManager:
         """主动推送消息connid
         """
         for target in self._connections:
-            print target, 'target'
             try:
                 conn = self.getConnectionByID(target)
                 if conn:
@@ -90,7 +87,6 @@ class ConnectionManager:
 class Connection:
     """
     """
-
     def __init__(self, _conn):
         """
         id 连接的ID
