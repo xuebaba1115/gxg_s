@@ -21,7 +21,7 @@ class Gamemanger(object):
         _ps = pople(json_data["name"], json_data["x"],
                     json_data["y"], json_data["connid"])
         if _ps.connid in self.clients:
-            raise Exception("系统记录冲突")
+            raise Exception("System record conflict")
         self.clients[_ps.connid] = _ps
 
     def getallpopleinfo(self):
@@ -30,11 +30,14 @@ class Gamemanger(object):
         for p in self.clients.values():
             _data.append({"connid": p.connid, "x": p.x, "y": p.y,"name":p.name})
             _cid.append(p.connid)
-        return _cid, {"status":0,"data": _data}
+        return _cid, {"status":0,"command":"play","data": _data}
 
     def handledata(self, json_data):
         print "handle"
-        self.register(json_data)
+        if json_data["command"]!="init":
+            raise Exception("command error")
+            
+        self.register(json_data)    
 
 
 class pople(object):

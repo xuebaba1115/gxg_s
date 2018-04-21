@@ -31,7 +31,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
         print "open"
         connid = self.factory.connmanager.addConnection(self)
         self.factory.connmanager.pushObjectbyconnID({"data": "servce say open %s" % (
-            connid), "connid": connid, "command": "init", "x": connid, "y": connid, "name": "name%s" % connid}, [connid])
+            connid), "connid": connid, "command": "init", "x": connid, "y": connid, "name": "name%s" % connid,"errcode":0,"errmsg":""}, [connid])
 
     def onClose(self, wasClean, code, reason):
         print "onclose"
@@ -49,10 +49,8 @@ class GxgServerProtocol(WebSocketServerProtocol):
             try:
                 x = json.loads(payload.decode('utf8'))
                 self.factory.gamemanger_A.handledata(x)
-                self.sendMessage(json.dumps(x).encode('utf8'))
             except Exception as e:
-                self.sendMessage(json.dumps(payload).encode('utf8'))
-                self.sendClose(1000, u"Exception raised: {0}".format(e))
+                self.sendMessage(json.dumps({"errcode":1,"errmsg":"%s"%e}).encode('utf8'))
 
 
 class GxgServerFactory(WebSocketServerFactory):
