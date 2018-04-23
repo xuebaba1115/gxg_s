@@ -55,8 +55,11 @@ class GxgServerProtocol(WebSocketServerProtocol):
 
     @inlineCallbacks
     def slowsquare(self, x):
-        yield self.factory.gamemanger_A.handledata(x)
-        returnValue(None)
+        if x["command"]=="init":
+            self.factory.gamemanger_A.register(x)
+        else:
+            yield self.factory.gamemanger_A.handledata(x)
+            returnValue(None)
                 
 
 
@@ -73,7 +76,7 @@ class GxgServerFactory(WebSocketServerFactory):
         sendlist, msg = self.gamemanger_A.getallpopleinfo()
         print sendlist, msg
         self.broadcast(json.dumps(msg).encode('utf8'), sendlist)
-        reactor.callLater(4, self.tick)
+        reactor.callLater(5, self.tick)
 
     def broadcast(self, msg, sendlist):
         print("broadcasting prepared message '{}' ..".format(msg))
