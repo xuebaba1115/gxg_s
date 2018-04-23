@@ -28,6 +28,7 @@
                   sock = null;
                }
                sock.onmessage = function(e) {
+                  document.getElementById('message').value = e.data
                   log("Got echo: " + e.data);
                }
             }
