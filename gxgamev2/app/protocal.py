@@ -44,13 +44,20 @@ class GxgServerProtocol(WebSocketServerProtocol):
         self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
         # WebSocketServerProtocol.connectionLost(self, reason)
 
+    @inlineCallbacks
     def onMessage(self, payload, isBinary):
         if not isBinary:
             try:
                 x = json.loads(payload.decode('utf8'))
-                self.factory.gamemanger_A.handledata(x)
+                res = yield self.slowsquare(x)
             except Exception as e:
                 self.sendMessage(json.dumps({"errcode":1,"errmsg":"%s"%e}).encode('utf8'))
+
+    @inlineCallbacks
+    def slowsquare(self, x):
+        yield self.factory.gamemanger_A.handledata(x)
+        returnValue(None)
+                
 
 
 class GxgServerFactory(WebSocketServerFactory):
@@ -66,7 +73,7 @@ class GxgServerFactory(WebSocketServerFactory):
         sendlist, msg = self.gamemanger_A.getallpopleinfo()
         print sendlist, msg
         self.broadcast(json.dumps(msg).encode('utf8'), sendlist)
-        reactor.callLater(10, self.tick)
+        reactor.callLater(4, self.tick)
 
     def broadcast(self, msg, sendlist):
         print("broadcasting prepared message '{}' ..".format(msg))
