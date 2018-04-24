@@ -4,7 +4,7 @@ from twisted.internet import reactor
 import json
 import time
 import random
-from twisted.internet.defer import Deferred, DeferredList
+from twisted.internet.defer import Deferred, DeferredList,gatherResults
 
 
 class Gamemanger(object):
@@ -32,35 +32,23 @@ class Gamemanger(object):
         _cid = []
         for p in self.clients.values():
             _data.append({"connid": p.connid, "x": p.x, "y": p.y,
-                          "name": p.name, "jineng": "qwer", "action": 'move'})
+                          "name": p.name, "jineng": p.jineng, "action": 'move'})
             _cid.append(p.connid)
         return _cid, {"status": 0, "command": "play", "data": _data}
 
     def handledata(self, json_data):
-        deferred_move = Deferred()
-        deferred_jineng = Deferred()
+        # d = Deferred()
+        p=self.clients.get(json_data["data"][0]["connid"],None)
+        p.x=json_data["data"][0]["x"]
+        p.y=json_data["data"][0]["y"]
+        p.jineng=json_data["data"][0]["jineng"]
+        # d.callback(None)
+        return None
 
-        # Pack them into a DeferredList
-        dl = DeferredList([deferred_move,deferred_jineng], consumeErrors=True)
-
-        # Add our callback
-        dl.addCallback(self.gogo)
-        # Fire our three deferreds with various values.
-        reactor.callLater(10, deferred_move.callback,"move")
-        reactor.callLater(5, deferred_jineng.callback,"jineng")
-        
-        # deferred_move.callback(json_data["data"][0])
-        return deferred_move
-
-    def gogo(self, json_data):
-        print '################'
-        # time.sleep(15)
-        print json_data
-           
 
 
 class pople(object):
-    def __init__(self, name, connid, x, y, jineng=''):
+    def __init__(self, name, connid, x, y, jineng=None):
         self.connid = connid
         self.name = name
         self.x = x

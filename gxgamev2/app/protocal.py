@@ -59,7 +59,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
             self.factory.gamemanger_A.register(x)
         else:
             yield self.factory.gamemanger_A.handledata(x)
-            returnValue(None)
+            # returnValue(None)
                 
 
 
@@ -74,7 +74,6 @@ class GxgServerFactory(WebSocketServerFactory):
 
     def tick(self):
         sendlist, msg = self.gamemanger_A.getallpopleinfo()
-        print sendlist, msg
         self.broadcast(json.dumps(msg).encode('utf8'), sendlist)
         reactor.callLater(5, self.tick)
 
