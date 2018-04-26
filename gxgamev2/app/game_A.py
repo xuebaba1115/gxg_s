@@ -27,7 +27,7 @@ class Gamemanger(object):
             raise Exception("System record conflict")
         self.clients[_ps.connid] = _ps
         null, players = self.getallpopleinfo()
-        print players
+        return players
 
     def getallpopleinfo(self):
         _data = []
