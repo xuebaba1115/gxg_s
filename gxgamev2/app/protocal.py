@@ -74,7 +74,7 @@ class GxgServerFactory(WebSocketServerFactory):
         WebSocketServerFactory.__init__(self, wsuri)
         self.connmanager = ConnectionManager()
         self.gamemanger_A = Gamemanger()
-        self.tick()
+        # self.tick()
 
     def tick(self):
         sendlist, msg = self.gamemanger_A.getallpopleinfo()
