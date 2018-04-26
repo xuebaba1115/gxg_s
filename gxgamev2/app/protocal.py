@@ -29,9 +29,9 @@ class GxgServerProtocol(WebSocketServerProtocol):
 
     def onOpen(self):
         print "open"
-        connid = self.factory.connmanager.addConnection(self)
-        self.factory.connmanager.pushObjectbyconnID({"data": "servce say open %s" % (
-            connid), "connid": connid, "command": "init", "x": connid, "y": connid, "name": "name%s" % connid,"errcode":0,"errmsg":""}, [connid])
+        # connid = self.factory.connmanager.addConnection(self)
+        # self.factory.connmanager.pushObjectbyconnID({"data": "servce say open %s" % (
+        #     connid), "connid": connid, "command": "init", "x": connid, "y": connid, "name": "name%s" % connid,"errcode":0,"errmsg":""}, [connid])
 
     def onClose(self, wasClean, code, reason):
         print "onclose"
@@ -51,16 +51,20 @@ class GxgServerProtocol(WebSocketServerProtocol):
                 x = json.loads(payload.decode('utf8'))
                 res = yield self.slowsquare(x)
             except Exception as e:
-                self.sendMessage(json.dumps({"errcode":1,"errmsg":"%s"%e}).encode('utf8'))
+                self.sendMessage(json.dumps(
+                    {"errcode": 1, "errmsg": "%s" % e}).encode('utf8'))
 
     @inlineCallbacks
     def slowsquare(self, x):
-        if x["command"]=="init":
-            self.factory.gamemanger_A.register(x)
+        if x["command"] == "init":
+            connid = self.factory.connmanager.addConnection(self)
+            self.factory.connmanager.pushObjectbyconnID({"data": "servce say open %s" % (
+                connid), "connid": connid, "command": "init", "x": connid, "y": connid, "name": "name%s" % connid, "errcode": 0, "errmsg": ""}, [connid])
+
+            self.factory.gamemanger_A.register(x,connid)
         else:
             yield self.factory.gamemanger_A.handledata(x)
             # returnValue(None)
-                
 
 
 class GxgServerFactory(WebSocketServerFactory):

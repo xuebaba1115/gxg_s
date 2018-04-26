@@ -19,9 +19,9 @@ class Gamemanger(object):
         except Exception as e:
             log.msg(str(e))
 
-    def register(self, json_data):
+    def register(self, json_data,connid):
         print "register"
-        _ps = pople(json_data["name"], json_data["connid"],
+        _ps = pople(json_data["name"], connid,
                     json_data["x"], json_data["y"])
         if _ps.connid in self.clients:
             raise Exception("System record conflict")
@@ -32,27 +32,27 @@ class Gamemanger(object):
         _cid = []
         for p in self.clients.values():
             _data.append({"connid": p.connid, "x": p.x, "y": p.y,
-                          "name": p.name, "jineng": p.jineng, "action": 'move'})
+                          "name": p.name})
             _cid.append(p.connid)
-        return _cid, {"status": 0, "command": "play", "data": _data}
+        return _cid, {"command": "play", "data": _data}
 
     def handledata(self, json_data):
+        print '################333'
         # d = Deferred()
         p=self.clients.get(json_data["data"][0]["connid"],None)
         p.x=json_data["data"][0]["x"]
         p.y=json_data["data"][0]["y"]
-        p.jineng=json_data["data"][0]["jineng"]
         # d.callback(None)
         return None
 
 
 
 class pople(object):
-    def __init__(self, name, connid, x, y, jineng=None):
+    def __init__(self, name, connid, x, y):
         self.connid = connid
         self.name = name
         self.x = x
         self.y = y
-        self.jineng = jineng
+
 
 
