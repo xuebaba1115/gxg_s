@@ -1,12 +1,13 @@
 # coding:utf8
 from app import db, app
 from app.models.users_models import User, WXUser
-from flask import Flask, Blueprint, render_template, abort, request, jsonify, g, url_for
+from flask import Flask, Blueprint, render_template, abort, request, jsonify, g, url_for,make_response , send_file,send_from_directory
 from flask_httpauth import HTTPBasicAuth
 import requests
 import json
 from app.utiles import WXBizDataCrypt, jm_jm, verify_auth_token, generate_auth_token
 from twisted.python import log
+import os,sys
 
 
 auth = HTTPBasicAuth()
@@ -107,4 +108,20 @@ def wxauth():
     token = generate_auth_token(saveus.id)
     return jsonify(token=token.decode('ascii'),nickName=wx_user['nickName'],gender=wx_user['gender'])
 
+
+
+
    
+@users.route('/api/downres/<path:filename>', methods=['GET'])
+def downres(filename): 
+    # response = make_response(send_file("resources"))
+    # return response
+    # if request.method=="GET":
+        # if os.path.isfile(os.path.join('resources', filename)):
+
+    return send_from_directory('/home/ubuntu/share',filename,as_attachment=True)
+        
+
+# @users.route('/api/tores', methods=['GET'])       
+# def tores():
+#     return url_for('localhost:3333')
