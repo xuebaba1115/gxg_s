@@ -34,7 +34,7 @@ class Gamemanger(object):
         _cid = []
         for p in self.clients.values():
             _data.append({"connid": p.connid, 'team': 0, 'tankType': 1, 'playerID': 1,
-                          'playerType': 0, "pos": {"x": p.x, "y": p.y}, "name": p.name})
+                          'playerType': 1, "pos": {"x": p.x, "y": p.y}, "name": p.name})
             _cid.append(p.connid)
         return _cid, {"command": "init", "players": _data}
 
