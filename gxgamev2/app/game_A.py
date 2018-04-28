@@ -20,6 +20,7 @@ class Gamemanger(object):
             log.msg(str(e))
 
     def register(self, json_data, connid):
+                        #   {"command":"init","name":"as","x":300,"y":150}                            
         print "register"
         _ps = pople(json_data["name"], connid,
                     json_data["x"], json_data["y"])
