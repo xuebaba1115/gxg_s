@@ -61,11 +61,16 @@ class GxgServerProtocol(WebSocketServerProtocol):
             # self.factory.connmanager.pushObjectbyconnID({"data": "servce say open %s" % (
                 # connid), "connid": connid, "command": "init", "x": connid, "y": connid, "name": "name%s" % connid, "errcode": 0, "errmsg": ""}, [connid])
 
-            getzhuce=self.factory.gamemanger_A.register(x,connid)
-            self.factory.connmanager.pushObjectbyconnID(getzhuce,[connid])
+            pl,msg=self.factory.gamemanger_A.register(x,connid)
+            # self.factory.connmanager.pushObjectbyconnID(getzhuce,[connid])
+            self.factory.broadcast(json.dumps(msg).encode('utf8'), pl)
+            
         else:
-            yield self.factory.gamemanger_A.handledata(x)
-            # returnValue(None)
+            aa = yield self.factory.gamemanger_A.handledata(x)
+            print aa[0],aa[1]
+            self.factory.broadcast(json.dumps(aa[1]).encode('utf8'), aa[0])
+            returnValue(aa)
+            
 
 
 class GxgServerFactory(WebSocketServerFactory):
