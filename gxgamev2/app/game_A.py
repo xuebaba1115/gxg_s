@@ -26,15 +26,23 @@ class Gamemanger(object):
         if _ps.connid in self.clients:
             raise Exception("System record conflict")
         self.clients[_ps.connid] = _ps
-        pl, players = self.getallpopleinfo("init")
+        pl, selfplayers = self.getallpopleinfo("init")
         _ps.playerType = 2
-        return pl, players
+        xx, players = self.getpopleinfobyconnid("init",_ps.connid)
+        return pl, players, selfplayers
 
     def getallpopleinfo(self, command):
         _data = []
         for p in self.clients.values():
             _data.append({"connid": p.connid, 'team': 0, 'tankType': 1, 'playerID': p.connid,
                           "playerType": p.playerType, "pos": {"x": p.x, "y": p.y}, "name": p.name})
+        return self.clients.keys(), {"command": command, "players": _data}
+
+    def getpopleinfobyconnid(self, command, connid):
+        _data = []
+        p = self.clients.get(connid, None)
+        _data.append({"connid": p.connid, 'team': 0, 'tankType': 1, 'playerID': p.connid,
+                     "playerType": 2, "pos": {"x": p.x, "y": p.y}, "name": p.name})
         return self.clients.keys(), {"command": command, "players": _data}
 
     def actions(self, json_data):
@@ -60,3 +68,4 @@ class pople(object):
         self.x = x
         self.y = y
         self.playerType = playerType
+
