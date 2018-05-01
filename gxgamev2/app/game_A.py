@@ -55,9 +55,9 @@ class Gamemanger(object):
         d = Deferred()
         try:
             p = self.clients.get(json_data["player"]["connid"], None)
-            p.x = json_data["player"]["pos"]["x"]
-            p.y = json_data["player"]["pos"]["y"]
-            p.angle = json_data["player"]["angle"]
+            p.x = json_data.get('player').get("pos").get("x")
+            p.y = json_data.get('player').get("pos").get("y")
+            p.angle = json_data.get('player').get('angle')
         except KeyError as e:
             print e
             pass
