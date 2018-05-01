@@ -42,7 +42,7 @@ class Gamemanger(object):
         for p in self.clients.values():
             _data={"connid": p.connid, 'team': 0, 'tankType': 1, 'playerID': p.connid,
                           "playerType": p.playerType, "angle": p.angle, "pos": {"x": p.x, "y": p.y}, "name": p.name}
-            yield self.clients.keys(), {"command": command, "players": _data}
+            yield self.clients.keys(), {"command": command, "player": _data}
 
 
     def getpopleinfobyconnid(self, command, connid):
