@@ -53,10 +53,14 @@ class Gamemanger(object):
 
     def handledata(self, json_data):
         d = Deferred()
-        p = self.clients.get(json_data["player"]["connid"], None)
-        p.x = json_data["player"]["pos"]["x"]
-        p.y = json_data["player"]["pos"]["y"]
-        p.angle = json_data["player"]["angle"]
+        try:
+            p = self.clients.get(json_data["player"]["connid"], None)
+            p.x = json_data["player"]["pos"]["x"]
+            p.y = json_data["player"]["pos"]["y"]
+            p.angle = json_data["player"]["angle"]
+        except KeyError as e:
+            print e
+            pass
         d.addCallback(self.actions)
         d.callback(json_data)
         return d
