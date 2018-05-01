@@ -35,20 +35,20 @@ class Gamemanger(object):
         _data = []
         for p in self.clients.values():
             _data.append({"connid": p.connid, 'team': 0, 'tankType': 1, 'playerID': p.connid,
-                          "playerType": p.playerType, "pos": {"x": p.x, "y": p.y}, "name": p.name})
+                          "playerType": p.playerType, "angle":p.angle,"pos": {"x": p.x, "y": p.y}, "name": p.name})
         return self.clients.keys(), {"command": command, "players": _data}
 
     def getpopleinfobyconnid(self, command, connid):
         _data = []
         p = self.clients.get(connid, None)
         _data.append({"connid": p.connid, 'team': 0, 'tankType': 1, 'playerID': p.connid,
-                     "playerType": 2, "pos": {"x": p.x, "y": p.y}, "name": p.name})
+                     "playerType": 2,"angle":p.angle, "pos": {"x": p.x, "y": p.y}, "name": p.name})
         return self.clients.keys(), {"command": command, "players": _data}
 
     def actions(self, json_data):
         p = self.clients.get(json_data['player']['connid'], None)
         _data = {"connid": p.connid, 'team': 0, 'tankType': 1, 'playerID': p.connid,
-                 'playerType': 1, "pos": {"x": p.x, "y": p.y}, "name": p.name}
+                 'playerType': 1, "angle":p.angle,"pos": {"x": p.x, "y": p.y}, "name": p.name}
         return self.clients.keys(), {"command": json_data['command'], "player": _data}
 
     def handledata(self, json_data):
@@ -56,16 +56,18 @@ class Gamemanger(object):
         p = self.clients.get(json_data["player"]["connid"], None)
         p.x = json_data["player"]["pos"]["x"]
         p.y = json_data["player"]["pos"]["y"]
+        p.angle = json_data["player"]["angle"]
         d.addCallback(self.actions)
         d.callback(json_data)
         return d
 
 
 class pople(object):
-    def __init__(self, name, connid, x, y, playerType):
+    def __init__(self, name, connid, x, y, playerType,angle=90):
         self.connid = connid
         self.name = name
         self.x = x
         self.y = y
+        self.angle = angle
         self.playerType = playerType
 
