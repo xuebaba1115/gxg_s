@@ -21,7 +21,6 @@ class Gamemanger(object):
 
     def register(self, json_data, connid):
         print "register"
-        print json_data
         _ps = pople(json_data["name"], connid,
                     json_data["x"], json_data["y"], json_data["playerType"], json_data["angle"])
         if _ps.connid in self.clients:
@@ -39,6 +38,13 @@ class Gamemanger(object):
                           "playerType": p.playerType, "angle": p.angle, "pos": {"x": p.x, "y": p.y}, "name": p.name})
         return self.clients.keys(), {"command": command, "players": _data}
 
+    def movebroad(self, command):
+        for p in self.clients.values():
+            _data={"connid": p.connid, 'team': 0, 'tankType': 1, 'playerID': p.connid,
+                          "playerType": p.playerType, "angle": p.angle, "pos": {"x": p.x, "y": p.y}, "name": p.name}
+            yield self.clients.keys(), {"command": command, "players": _data}
+
+
     def getpopleinfobyconnid(self, command, connid):
         _data = []
         p = self.clients.get(connid, None)
@@ -47,10 +53,13 @@ class Gamemanger(object):
         return self.clients.keys(), {"command": command, "players": _data}
 
     def actions(self, json_data):
-        p = self.clients.get(json_data['player']['connid'], None)
-        _data = {"connid": p.connid, 'team': 0, 'tankType': 1, 'playerID': p.connid,
-                 'playerType': 1, "angle": p.angle, "pos": {"x": p.x, "y": p.y}, "name": p.name}
-        return self.clients.keys(), {"command": json_data['command'], "player": _data}
+        if json_data['command'] == "move":
+            pass
+        else:
+            p = self.clients.get(json_data['player']['connid'], None)
+            _data = {"connid": p.connid, 'team': 0, 'tankType': 1, 'playerID': p.connid,
+                    'playerType': 1, "angle": p.angle, "pos": {"x": p.x, "y": p.y}, "name": p.name}
+            return self.clients.keys(), {"command": json_data['command'], "player": _data}
 
     def _move(self, json_data):
         p = self.clients.get(json_data["player"]["connid"], None)

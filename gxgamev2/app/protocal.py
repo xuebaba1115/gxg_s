@@ -70,9 +70,12 @@ class GxgServerProtocol(WebSocketServerProtocol):
 
         else:
             aa = yield self.factory.gamemanger_A.handledata(x)
-            print aa[0], aa[1]
-            self.factory.broadcast(json.dumps(aa[1]).encode('utf8'), aa[0])
-            returnValue(aa)
+            if aa==None:
+                returnValue(None)
+            else:
+                print aa[0], aa[1]
+                self.factory.broadcast(json.dumps(aa[1]).encode('utf8'), aa[0])
+                returnValue(aa)
 
 
 class GxgServerFactory(WebSocketServerFactory):
@@ -82,17 +85,23 @@ class GxgServerFactory(WebSocketServerFactory):
         WebSocketServerFactory.__init__(self, wsuri)
         self.connmanager = ConnectionManager()
         self.gamemanger_A = Gamemanger()
-        # self.tick()
+        self.tick()
 
     def tick(self):
-        sendlist, msg = self.gamemanger_A.getallpopleinfo()
-        self.broadcast(json.dumps(msg).encode('utf8'), sendlist)
-        reactor.callLater(5, self.tick)
+        for sendlist, msg in self.gamemanger_A.movebroad("move"):
+            self.broadcast(json.dumps(msg).encode('utf8'), sendlist)
+        reactor.callLater(0.08, self.tick)
 
     def broadcast(self, msg, sendlist):
-        print("broadcasting prepared message '{}' ..".format(msg))
+        # print("broadcasting prepared message '{}' ..".format(msg))
         preparedMsg = self.prepareMessage(msg)
         self.connmanager.pushObjectbyconnIDlist(preparedMsg, sendlist)
+
+
+# test:
+# {"command":"init","x":100,"y":210,"name":"xlc","playerType":1,"angle":90}
+# {"command":"move","player": {"pos":{"y":500,"x":250},"connid": 1}}
+
 
         # self.clients = []
         # self.tickcount = 0
