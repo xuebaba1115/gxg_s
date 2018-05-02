@@ -89,7 +89,8 @@ class GxgServerFactory(WebSocketServerFactory):
 
     def tick(self):
         for sendlist, msg in self.gamemanger_A.movebroad("move"):
-            self.broadcast(json.dumps(msg).encode('utf8'), sendlist)
+            if msg["player"] != None:
+                self.broadcast(json.dumps(msg).encode('utf8'), sendlist)
         reactor.callLater(0.08, self.tick)
 
     def broadcast(self, msg, sendlist):

@@ -40,8 +40,11 @@ class Gamemanger(object):
 
     def movebroad(self, command):
         for p in self.clients.values():
-            _data={"connid": p.connid, 'team': 0, 'tankType': 1, 'playerID': p.connid,
-                          "playerType": p.playerType, "angle": p.angle, "pos": {"x": p.x, "y": p.y}, "name": p.name}
+            _data=None
+            if p.movestat :
+                _data={"connid": p.connid, 'team': 0, 'tankType': 1, 'playerID': p.connid,
+                            "playerType": p.playerType, "angle": p.angle, "pos": {"x": p.x, "y": p.y}, "name": p.name}
+                p.movestat =False                            
             yield self.clients.keys(), {"command": command, "player": _data}
 
 
@@ -65,6 +68,7 @@ class Gamemanger(object):
         p = self.clients.get(json_data["player"]["connid"], None)
         p.x = json_data.get('player').get("pos").get("x")
         p.y = json_data.get('player').get("pos").get("y")
+        p.movestat = True
         # return p
 
     def _rotation(self, json_data):
@@ -94,4 +98,5 @@ class pople(object):
         self.y = y
         self.playerType = playerType
         self.angle = angle
+        self.movestat = False
         
