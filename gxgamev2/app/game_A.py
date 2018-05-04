@@ -79,8 +79,8 @@ class Gamemanger(object):
     def switch(self, json_data):
         return {
             'move': self._move,
-            'rotation': self._rotation
-            'attack':None
+            'rotation': self._rotation,
+            'attack': None
         }[json_data["command"]](json_data)
 
     def handledata(self, json_data):
