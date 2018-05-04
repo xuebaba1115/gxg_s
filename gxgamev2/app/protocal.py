@@ -73,9 +73,8 @@ class GxgServerProtocol(WebSocketServerProtocol):
             if aa==None:
                 returnValue(None)
             else:
-                print aa[0], aa[1]
                 self.factory.broadcast(json.dumps(aa[1]).encode('utf8'), aa[0])
-                returnValue(aa)
+                returnValue(None)
 
 
 class GxgServerFactory(WebSocketServerFactory):
@@ -91,7 +90,7 @@ class GxgServerFactory(WebSocketServerFactory):
         for sendlist, msg in self.gamemanger_A.movebroad("move"):
             if msg["player"] != None:
                 self.broadcast(json.dumps(msg).encode('utf8'), sendlist)
-        reactor.callLater(0.08, self.tick)
+        reactor.callLater(0.1, self.tick)
 
     def broadcast(self, msg, sendlist):
         # print("broadcasting prepared message '{}' ..".format(msg))
