@@ -34,7 +34,9 @@ class ConnectionManager:
         @param connID: int 连接的id
         """
         try:
+            print self._connections[connID]
             del self._connections[connID]
+            print self._connections
         except Exception as e:
             log.msg(str(e))
 
