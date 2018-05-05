@@ -24,8 +24,8 @@ class ConnectionManager:
         @param _conn: Conn object
         """
         _conn = Connection(conn)
-        if _conn.id in self._connections:
-            raise Exception("系统记录冲突")
+        # if _conn.id in self._connections:
+        #     raise Exception("系统记录冲突")
         self._connections[_conn.id] = _conn
         return _conn.id
 

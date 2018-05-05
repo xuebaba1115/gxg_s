@@ -23,8 +23,8 @@ class Gamemanger(object):
         print "register"
         _ps = pople(json_data["name"], connid,
                     json_data["x"], json_data["y"], json_data["playerType"], json_data["angle"])
-        if _ps.connid in self.clients:
-            raise Exception("System record conflict")
+        # if _ps.connid in self.clients:
+        #     raise Exception("System record conflict")
         self.clients[_ps.connid] = _ps
         pl, selfplayers = self.getallpopleinfo("init")
         _ps.playerType = 2
