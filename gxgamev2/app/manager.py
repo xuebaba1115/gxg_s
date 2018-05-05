@@ -35,6 +35,7 @@ class ConnectionManager:
         """
         try:
             print self._connections[connID]
+            self.loseConnection(connID)
             del self._connections[connID]
             print self._connections
         except Exception as e:
