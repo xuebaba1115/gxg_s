@@ -92,7 +92,8 @@ class Gamemanger(object):
         try:
             self.switch(json_data)
         except TypeError as e:
-            log.err(str(e))
+            pass
+            # log.err(str(e))
         d.addCallback(self.actions)
         d.callback(json_data)
         return d
