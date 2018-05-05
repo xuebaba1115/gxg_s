@@ -58,11 +58,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
     def slowsquare(self, x):
         if x["command"] == "init":
             connid = self.factory.connmanager.addConnection(self)
-            # self.factory.connmanager.pushObjectbyconnID({"data": "servce say open %s" % (
-            # connid), "connid": connid, "command": "init", "x": connid, "y": connid, "name": "name%s" % connid, "errcode": 0, "errmsg": ""}, [connid])
-
-            pl, allplayers, selfplayers = self.factory.gamemanger_A.register(
-                x, connid)
+            pl, allplayers, selfplayers = self.factory.gamemanger_A.register(x, connid)
             pl.remove(connid)
             self.factory.connmanager.pushObjectbyconnID(selfplayers, [connid])
             self.factory.broadcast(json.dumps(

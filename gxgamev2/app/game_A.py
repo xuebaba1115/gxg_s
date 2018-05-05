@@ -76,11 +76,15 @@ class Gamemanger(object):
         p.angle = json_data.get('player').get('angle')
         # return p
 
+    def _gameover(self,json):
+        reactor.callLater(1, self.unregister,json["player"]["connid"])       
+
     def switch(self, json_data):
         return {
             'move': self._move,
             'rotation': self._rotation,
-            'attack': None
+            'attack': None,
+            'gameover': self._gameover
         }[json_data["command"]](json_data)
 
     def handledata(self, json_data):

@@ -24,7 +24,6 @@ class ConnectionManager:
         @param _conn: Conn object
         """
         _conn = Connection(conn)
-        print _conn.id
         if _conn.id in self._connections:
             raise Exception("系统记录冲突")
         self._connections[_conn.id] = _conn
@@ -35,10 +34,8 @@ class ConnectionManager:
         @param connID: int 连接的id
         """
         try:
-            print self._connections[connID]
             self.loseConnection(connID)
             del self._connections[connID]
-            print self._connections
         except Exception as e:
             log.msg(str(e))
 
