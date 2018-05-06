@@ -100,7 +100,7 @@ class Gamemanger(object):
 
 
 class pople(object):
-    def __init__(self, name, connid, x, y, playerType, angle,tankType=1):
+    def __init__(self, name, connid, x, y, playerType, angle,tankType):
         self.connid = connid
         self.name = name
         self.x = x
