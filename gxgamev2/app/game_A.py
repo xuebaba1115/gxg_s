@@ -22,9 +22,9 @@ class Gamemanger(object):
     def register(self, json_data, connid):
         print "register"
         _ps = pople(json_data["name"], connid,
-                    json_data["x"], json_data["y"], json_data["playerType"], json_data["angle"])
-        # if _ps.connid in self.clients:
-        #     raise Exception("System record conflict")
+                    json_data["x"], json_data["y"], json_data["playerType"], json_data["angle"],random.randint(1,3))
+        if _ps.connid in self.clients:
+            raise Exception("System record conflict")
         self.clients[_ps.connid] = _ps
         pl, selfplayers = self.getallpopleinfo("init")
         _ps.playerType = 2
@@ -34,7 +34,7 @@ class Gamemanger(object):
     def getallpopleinfo(self, command):
         _data = []
         for p in self.clients.values():
-            _data.append({"connid": p.connid, 'team': 0, 'tankType': 1, 'playerID': p.connid,
+            _data.append({"connid": p.connid, 'team': 0, 'tankType': p.tankType, 'playerID': p.connid,
                           "playerType": p.playerType, "angle": p.angle, "pos": {"x": p.x, "y": p.y}, "name": p.name})
         return self.clients.keys(), {"command": command, "players": _data}
 
@@ -42,7 +42,7 @@ class Gamemanger(object):
         for p in self.clients.values():
             _data=None
             if p.movestat :
-                _data={"connid": p.connid, 'team': 0, 'tankType': 1, 'playerID': p.connid,
+                _data={"connid": p.connid, 'team': 0, 'tankType': p.tankType, 'playerID': p.connid,
                             "playerType": p.playerType, "angle": p.angle, "pos": {"x": p.x, "y": p.y}, "name": p.name}
                 p.movestat =False                            
             yield self.clients.keys(), {"command": command, "player": _data}
@@ -51,7 +51,7 @@ class Gamemanger(object):
     def getpopleinfobyconnid(self, command, connid):
         _data = []
         p = self.clients.get(connid, None)
-        _data.append({"connid": p.connid, 'team': 0, 'tankType': 1, 'playerID': p.connid,
+        _data.append({"connid": p.connid, 'team': 0, 'tankType': p.tankType, 'playerID': p.connid,
                       "playerType": 2, "angle": p.angle, "pos": {"x": p.x, "y": p.y}, "name": p.name})
         return self.clients.keys(), {"command": command, "players": _data}
 
@@ -60,7 +60,7 @@ class Gamemanger(object):
             pass
         else:
             p = self.clients.get(json_data['player']['connid'], None)
-            _data = {"connid": p.connid, 'team': 0, 'tankType': 1, 'playerID': p.connid,
+            _data = {"connid": p.connid, 'team': 0, 'tankType': p.tankType, 'playerID': p.connid,
                     'playerType': 1, "angle": p.angle, "pos": {"x": p.x, "y": p.y}, "name": p.name}
             return self.clients.keys(), {"command": json_data['command'], "player": _data}
 
@@ -100,7 +100,7 @@ class Gamemanger(object):
 
 
 class pople(object):
-    def __init__(self, name, connid, x, y, playerType, angle):
+    def __init__(self, name, connid, x, y, playerType, angle,tankType=1):
         self.connid = connid
         self.name = name
         self.x = x
@@ -108,4 +108,5 @@ class pople(object):
         self.playerType = playerType
         self.angle = angle
         self.movestat = False
+        self.tankType = tankType
         
