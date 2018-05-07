@@ -67,10 +67,10 @@ class GxgServerProtocol(WebSocketServerProtocol):
         else:
             aa = yield self.factory.gamemanger_A.handledata(x)
             if aa==None:
-                returnValue(None)
+                returnValue('')
             else:
                 self.factory.broadcast(json.dumps(aa[1]).encode('utf8'), aa[0])
-                returnValue(None)
+                returnValue('')
 
 
 class GxgServerFactory(WebSocketServerFactory):
