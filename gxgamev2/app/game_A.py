@@ -84,7 +84,8 @@ class Gamemanger(object):
             'move': self._move,
             'rotation': self._rotation,
             'attack': None,
-            'gameover': self._gameover
+            'gameover': self._gameover,
+            'kill':self._gameover
         }[json_data["command"]](json_data)
 
     def handledata(self, json_data):
