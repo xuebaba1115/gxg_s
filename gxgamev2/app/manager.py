@@ -37,7 +37,7 @@ class ConnectionManager:
             self.loseConnection(connID)
             del self._connections[connID]
         except Exception as e:
-            log.msg(str(e))
+            log.msg('dropconn',str(e))
 
     def getConnectionByID(self, connID):
         """根据ID获取一条连接

@@ -17,7 +17,7 @@ class Gamemanger(object):
         try:
             del self.clients[client]
         except Exception as e:
-            log.msg(str(e))
+            log.msg('unregister',str(e))
 
     def register(self, json_data, connid):
         print "register"

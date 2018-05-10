@@ -31,6 +31,7 @@ def verify_password(username_or_token, password):
 
 @users.route('/')
 def page_home():
+    # print '$$$$$$',request.headers.get('User-Agent') ,request.headers.get('Host')
     return render_template('index.html')
 
 
