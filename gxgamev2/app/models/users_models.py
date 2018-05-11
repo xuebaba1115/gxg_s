@@ -44,3 +44,5 @@ class WXUser(db.Model):
     country = db.Column(db.String(32))
     nickName = db.Column(db.String(32))
     gender = db.Column(db.Integer)
+    gamestatus = db.Column(db.Integer,default=0) #0:noplay #1:play
+    userstatus = db.Column(db.Integer,default=0) #0:weixin #1:youke

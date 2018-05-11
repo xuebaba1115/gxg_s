@@ -34,11 +34,11 @@ class jm_jm(object):
 
     @classmethod
     def hash_txt(self, txt):
-        self.password_hash = pwd_context.encrypt(txt)
+        return pwd_context.encrypt(txt)
 
     @classmethod
-    def verify_txt(self, txt):
-        return pwd_context.verify(txt, self.password_hash)
+    def verify_txt(self, txt,pwd):
+        return pwd_context.verify(txt,pwd)
 
 
 def generate_auth_token(pwd, expiration=15):

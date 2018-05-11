@@ -110,16 +110,29 @@ def wxauth():
     return jsonify(token=token.decode('ascii'),nickName=wx_user['nickName'],gender=wx_user['gender'])
 
 
+@users.route('/api/addyouke',methods=['POST'])
+def new_youke():
+    youkeopenid = '%s%s'%(request.headers.get('User-Agent') ,request.headers.get('Host'))
+    print '$$$$$$',request.headers.get('User-Agent') ,request.headers.get('Host'),youkeopenid 
+
+    getus = WXUser.query.filter_by(openid=youkeopenid).first()
+    if getus is not None:
+        token = generate_auth_token(getus.id)
+        return jsonify(token=token.decode('ascii'),gamestatus=saveus.gamestatus)
+
+
+    openid=jm_jm.hash_txt(youkeopenid)
+    wxuser = WXUser(openid=openid,gamestatus=1)
+    db.session.add(wxuser)
+    db.session.commit()
+    saveus = WXUser.query.filter_by(openid=openid).first()
+    token = generate_auth_token(saveus.id)
+    return jsonify(token=token.decode('ascii'),gamestatus=saveus.gamestatus)
 
 
    
 @users.route('/api/downres/<path:filename>', methods=['GET'])
 def downres(filename): 
-    # response = make_response(send_file("resources"))
-    # return response
-    # if request.method=="GET":
-        # if os.path.isfile(os.path.join('resources', filename)):
-
     return send_from_directory('/home/ubuntu/share',filename,as_attachment=True)
         
 
