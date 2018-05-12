@@ -1,4 +1,4 @@
-import base64
+import base64,hashlib
 import json
 from Crypto.Cipher import AES
 from passlib.apps import custom_app_context as pwd_context
@@ -40,8 +40,12 @@ class jm_jm(object):
     def verify_txt(self, txt,pwd):
         return pwd_context.verify(txt,pwd)
 
+    @classmethod
+    def hash_md5(self, txt):
+        return hashlib.md5(txt)
 
-def generate_auth_token(pwd, expiration=15):
+
+def generate_auth_token(pwd, expiration=600):
     s = Serializer("gxgamgv2", expires_in=expiration)
     return s.dumps({'id': pwd})
 

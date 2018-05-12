@@ -1,4 +1,3 @@
-# coding:utf8
 from app import db, app
 from app.models.users_models import User, WXUser
 from flask import Flask, Blueprint, render_template, abort, request, jsonify, g, url_for,make_response , send_file,send_from_directory
@@ -8,6 +7,7 @@ import json
 from app.utiles import WXBizDataCrypt, jm_jm, verify_auth_token, generate_auth_token
 from twisted.python import log
 import os,sys
+from app.game_B import Gamemanger_B
 
 
 auth = HTTPBasicAuth()
@@ -112,22 +112,33 @@ def wxauth():
 
 @users.route('/api/addyouke',methods=['POST'])
 def new_youke():
-    youkeopenid = '%s%s'%(request.headers.get('User-Agent') ,request.headers.get('Host'))
-    print '$$$$$$',request.headers.get('User-Agent') ,request.headers.get('Host'),youkeopenid 
-
+    youkeopenid = jm_jm.hash_md5('%s%s'%(request.headers.get('User-Agent') ,request.headers.get('Host'))).hexdigest()
     getus = WXUser.query.filter_by(openid=youkeopenid).first()
     if getus is not None:
         token = generate_auth_token(getus.id)
-        return jsonify(token=token.decode('ascii'),gamestatus=saveus.gamestatus)
+        return jsonify(token=token.decode('ascii'),gamestatus=getus.gamestatus)
 
-
-    openid=jm_jm.hash_txt(youkeopenid)
-    wxuser = WXUser(openid=openid,gamestatus=1)
+    wxuser = WXUser(openid=youkeopenid,gamestatus=1)
     db.session.add(wxuser)
     db.session.commit()
-    saveus = WXUser.query.filter_by(openid=openid).first()
+    saveus = WXUser.query.filter_by(openid=youkeopenid).first()
     token = generate_auth_token(saveus.id)
     return jsonify(token=token.decode('ascii'),gamestatus=saveus.gamestatus)
+
+@users.route('/api/creatroom')
+def creatroom():
+    try:
+        token = request.headers['token'] 
+    except Exception as e:
+        return jsonify(error=1)
+    if verify_auth_token(token) == None:
+        return jsonify(error=1)
+
+    for i in range(3):
+        roomid=Gamemanger_B.getroomid()
+        if roomid != None:
+            break
+    return jsonify(roomid=roomid)
 
 
    
