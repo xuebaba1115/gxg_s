@@ -14,7 +14,7 @@ class Gamemanger_B(object):
         if self._roomid in self.rooms or self._roomid in [66666666,88888888]:
             return None
         else:    
-            self.rooms[self._roomid]=self._roomid
+            # self.rooms[self._roomid]=self._roomid
             return self._roomid
 
     def init_room(self,kw):
