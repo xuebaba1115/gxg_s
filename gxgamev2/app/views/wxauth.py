@@ -95,7 +95,7 @@ def wxauth():
     getus = WXUser.query.filter_by(openid=openid).first()
     if getus is not None:
         token = generate_auth_token(getus.id)
-        return jsonify(token=token.decode('ascii'),nickName=getus.nickName,gender=getus.gender)
+        return jsonify(token=token.decode('ascii'),nickName=getus.nickName,gender=getus.gender,pid=getus.id)
         # return "ssa"  # existing users
 
     pc = WXBizDataCrypt(appId, sessionKey)
@@ -107,7 +107,7 @@ def wxauth():
     db.session.commit()
     saveus = WXUser.query.filter_by(openid=openid).first()
     token = generate_auth_token(saveus.id)
-    return jsonify(token=token.decode('ascii'),nickName=wx_user['nickName'],gender=wx_user['gender'])
+    return jsonify(token=token.decode('ascii'),nickName=wx_user['nickName'],gender=wx_user['gender'],pid=saveus.id)
 
 
 @users.route('/api/addyouke',methods=['POST'])
@@ -116,14 +116,14 @@ def new_youke():
     getus = WXUser.query.filter_by(openid=youkeopenid).first()
     if getus is not None:
         token = generate_auth_token(getus.id)
-        return jsonify(token=token.decode('ascii'),gamestatus=getus.gamestatus)
+        return jsonify(token=token.decode('ascii'),gamestatus=getus.gamestatus,pid=getus.id)
 
     wxuser = WXUser(openid=youkeopenid,gamestatus=1)
     db.session.add(wxuser)
     db.session.commit()
     saveus = WXUser.query.filter_by(openid=youkeopenid).first()
     token = generate_auth_token(saveus.id)
-    return jsonify(token=token.decode('ascii'),gamestatus=saveus.gamestatus)
+    return jsonify(token=token.decode('ascii'),gamestatus=saveus.gamestatus,pid=saveus.id)
 
 @users.route('/api/creatroom')
 def creatroom():
