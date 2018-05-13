@@ -3,6 +3,7 @@ import json
 from app.utiles import verify_auth_token
 from manager import ConnectionManager
 from game_A import Gamemanger
+from game_B import Gamemanger_B
 from twisted.internet import reactor
 from autobahn.twisted.websocket import WebSocketServerFactory, \
     WebSocketServerProtocol, listenWS
@@ -20,12 +21,12 @@ class GxgServerProtocol(WebSocketServerProtocol):
         print 'onconnect'
         print("Client connecting: {}".format(request.peer))
         tk = request.params
-        # if tk.get('token'):
-        #     youhu = verify_auth_token(tk['token'].pop())
-        #     if not youhu:
-        #         self.dropConnection(abort=True)
-        # else:
-        #     self.dropConnection(abort=True)
+        if tk.get('token'):
+            youhu = verify_auth_token(tk['token'].pop())
+            if not youhu:
+                self.dropConnection(abort=True)
+        else:
+            self.dropConnection(abort=True)
 
     def onOpen(self):
         print "open"
@@ -64,6 +65,11 @@ class GxgServerProtocol(WebSocketServerProtocol):
             self.factory.broadcast(json.dumps(
                 allplayers).encode('utf8'), pl)
 
+        elif x["command"] in ['init_room','join_room','ready']:
+            print "#####"
+            self.factory.gamemanger_B.switch(data=x,conn=self)
+            pass
+
         else:
             aa = yield self.factory.gamemanger_A.handledata(x)
             if aa==None:
@@ -80,6 +86,7 @@ class GxgServerFactory(WebSocketServerFactory):
         WebSocketServerFactory.__init__(self, wsuri)
         self.connmanager = ConnectionManager()
         self.gamemanger_A = Gamemanger()
+        self.gamemanger_B =Gamemanger_B()
         self.tick()
 
     def tick(self):
