@@ -18,7 +18,7 @@ class Gamemanger_B(object):
             return self._roomid
 
     def init_room(self,kw):
-        print kw
+        print kw,"initroom"
         _room=mjroom(kw['data']['roomid'],kw['data']['pid'])
         if _room.roomid in self.rooms:
             raise Exception("System roomid conflict")
@@ -27,13 +27,14 @@ class Gamemanger_B(object):
         pass
 
     def join_room(self, kw):
-        print self.rooms
+        print kw,"joinroom"
         if kw['data']['roomid'] in self.rooms:
             room = self.rooms[kw['data']['roomid']]
             room.initplayer(kw['data'],kw['conn'])
         pass        
     
     def ready(self, kw):
+        print "ready",kw
         room = self.rooms[kw['data']['roomid']]
         room.readygame(kw['data'])
 
@@ -66,6 +67,7 @@ class mjroom(object):
  
 
     def initplayer(self, data,conn):
+        print data,"initplayer"
         _play=player(data['pid'],conn)
         if len(self.players) > 4:
             raise Exception("player ge 4")
