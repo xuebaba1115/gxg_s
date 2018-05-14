@@ -2,6 +2,7 @@
 from twisted.python import log
 import random
 import app.split 
+import json
 
 
 class Gamemanger_B(object):
@@ -14,7 +15,6 @@ class Gamemanger_B(object):
         if self._roomid in self.rooms or self._roomid in [66666666,88888888]:
             return None
         else:    
-            # self.rooms[self._roomid]=self._roomid
             return self._roomid
 
     def init_room(self,kw):
@@ -31,7 +31,9 @@ class Gamemanger_B(object):
         if kw['data']['roomid'] in self.rooms:
             room = self.rooms[kw['data']['roomid']]
             room.initplayer(kw['data'],kw['conn'])
-        pass        
+        else:
+            kw['conn'].sendMessage(json.dumps({"error":'wuxiao roomid'}).encode('utf8'))  
+   
     
     def ready(self, kw):
         print "ready",kw
@@ -79,12 +81,17 @@ class mjroom(object):
         for p in self.players.values():
             if data['pid']==p.pid:
                 p.readystat=data['readystat']
+                self.broadcast({"roomid":self.roomid,"pid":p.pid,"readystat":p.readystat})
             readyok+=p.readystat
         print readyok
         if readyok==4:
             print 'statgame'
             self.startgame()
-            pass
+
+    def broadcast(self, msg):
+        for p in self.players.values():
+            print("broadcasting prepared message '{}' ..".format(msg))
+            p.conn.sendMessage(json.dumps(msg))       
         
     def startgame(self):
         self.cards=[i for i in xrange(34) for j in xrange(4)]
@@ -95,6 +102,7 @@ class mjroom(object):
                     p.handcard[j] = p.handcard[j] + 1
                 except IndexError as e:
                     print '########',e
+            p.conn.sendMessage({"pid":p.pid,"game":p.handcard})                    
             print p.handcard
             print self.cards
         pass        
@@ -105,7 +113,7 @@ class mjroom(object):
 class player(object):
     def __init__(self,pid,conn,readystat=0):  #{readestat 0:没准备，1：准备}
         self.pid = pid
-        self.roomid= conn
+        self.conn= conn
         self.readystat= readystat
         self.handcard=[0 for i in xrange(34)]
 

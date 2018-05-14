@@ -46,3 +46,4 @@ class WXUser(db.Model):
     gender = db.Column(db.Integer)
     gamestatus = db.Column(db.Integer,default=0) #0:noplay #1:play
     userstatus = db.Column(db.Integer,default=0) #0:weixin #1:youke
+    roomid = db.Column(db.Integer)

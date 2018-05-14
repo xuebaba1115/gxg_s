@@ -1,12 +1,13 @@
 from app import db, app
 from app.models.users_models import User, WXUser
-from flask import Flask, Blueprint, render_template, abort, request, jsonify, g, url_for,make_response , send_file,send_from_directory
+from flask import Flask, Blueprint, render_template, abort, request, jsonify, g, url_for, make_response, send_file, send_from_directory
 from flask_httpauth import HTTPBasicAuth
 import requests
 import json
 from app.utiles import WXBizDataCrypt, jm_jm, verify_auth_token, generate_auth_token
 from twisted.python import log
-import os,sys
+import os
+import sys
 from app.game_B import Gamemanger_B
 
 
@@ -95,7 +96,7 @@ def wxauth():
     getus = WXUser.query.filter_by(openid=openid).first()
     if getus is not None:
         token = generate_auth_token(getus.id)
-        return jsonify(token=token.decode('ascii'),nickName=getus.nickName,gender=getus.gender,pid=getus.id)
+        return jsonify(token=token.decode('ascii'), nickName=getus.nickName, gender=getus.gender, pid=getus.id, roomid=getus.roomid)
         # return "ssa"  # existing users
 
     pc = WXBizDataCrypt(appId, sessionKey)
@@ -107,46 +108,54 @@ def wxauth():
     db.session.commit()
     saveus = WXUser.query.filter_by(openid=openid).first()
     token = generate_auth_token(saveus.id)
-    return jsonify(token=token.decode('ascii'),nickName=wx_user['nickName'],gender=wx_user['gender'],pid=saveus.id)
+    return jsonify(token=token.decode('ascii'), nickName=wx_user['nickName'], gender=wx_user['gender'], pid=saveus.id, roomid=saveus.roomid)
 
 
-@users.route('/api/addyouke',methods=['POST'])
+@users.route('/api/addyouke', methods=['POST'])
 def new_youke():
-    youkeopenid = jm_jm.hash_md5('%s%s'%(request.headers.get('User-Agent') ,request.headers.get('Host'))).hexdigest()
+    youkeopenid = jm_jm.hash_md5('%s%s' % (request.headers.get(
+        'User-Agent'), request.headers.get('Host'))).hexdigest()
     getus = WXUser.query.filter_by(openid=youkeopenid).first()
     if getus is not None:
         token = generate_auth_token(getus.id)
-        return jsonify(token=token.decode('ascii'),gamestatus=getus.gamestatus,pid=getus.id)
+        return jsonify(token=token.decode('ascii'), gamestatus=getus.gamestatus, pid=getus.id, roomid=getus.roomid)
 
-    wxuser = WXUser(openid=youkeopenid,gamestatus=1)
+    wxuser = WXUser(openid=youkeopenid, gamestatus=1)
     db.session.add(wxuser)
     db.session.commit()
     saveus = WXUser.query.filter_by(openid=youkeopenid).first()
     token = generate_auth_token(saveus.id)
-    return jsonify(token=token.decode('ascii'),gamestatus=saveus.gamestatus,pid=saveus.id)
+    return jsonify(token=token.decode('ascii'), gamestatus=saveus.gamestatus, pid=saveus.id, roomid=saveus.roomid)
+
 
 @users.route('/api/creatroom')
 def creatroom():
     try:
-        token = request.headers['token'] 
+        token = request.headers['token']
     except Exception as e:
-        return jsonify(error=1)
-    if verify_auth_token(token) == None:
-        return jsonify(error=1)
+        return jsonify(error=1,errormsg='no token')
+    sqlid = verify_auth_token(token)
+    if sqlid == None:
+        return jsonify(error=1,errormsg='token err')
+
+    us = WXUser.query.filter_by(id=sqlid['id']).first()
+    if us.roomid != None:
+        return jsonify(roomid=us.roomid)
 
     for i in range(3):
-        roomid=Gamemanger_B.getroomid()
+        roomid = Gamemanger_B.getroomid()
         if roomid != None:
             break
+    us.roomid=roomid   
+    db.session.commit()    
     return jsonify(roomid=roomid)
 
 
-   
 @users.route('/api/downres/<path:filename>', methods=['GET'])
-def downres(filename): 
-    return send_from_directory('/home/ubuntu/share',filename,as_attachment=True)
-        
+def downres(filename):
+    return send_from_directory('/home/ubuntu/share', filename, as_attachment=True)
 
-# @users.route('/api/tores', methods=['GET'])       
+
+# @users.route('/api/tores', methods=['GET'])
 # def tores():
 #     return url_for('localhost:3333')
