@@ -128,12 +128,17 @@ def new_youke():
     return jsonify(token=token.decode('ascii'), gamestatus=saveus.gamestatus, pid=saveus.id, roomid=saveus.roomid)
 
 
-@users.route('/api/creatroom')
+@users.route('/api/creatroom',methods=['GET', 'POST'])
 def creatroom():
     try:
         token = request.headers['token']
     except Exception as e:
         return jsonify(error=1,errormsg='no token')
+
+    if request.method=='GET':
+         roomstat=Gamemanger_B.getroomstatus(request.args.get('roomid'))
+         return jsonify(roomstat=roomstat)
+        
     sqlid = verify_auth_token(token)
     if sqlid == None:
         return jsonify(error=1,errormsg='token err')
