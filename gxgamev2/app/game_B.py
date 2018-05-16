@@ -41,7 +41,15 @@ class Gamemanger_B(object):
             room.initplayer(kw['data'],kw['conn'])
         else:
             kw['conn'].sendMessage(json.dumps({"error":'wuxiao roomid'}).encode('utf8'))  
-   
+            
+    def overroom(self, kw):
+        print kw,"overroom"
+        if kw['data']['roomid'] in self.rooms:
+            room = self.rooms[kw['data']['roomid']]
+            if room.roomroot==kw['data']['pid']:
+                for p in room.players.values():
+                    p.conn.dropConnection(abort=True)
+                del self.rooms[kw['data']['roomid']]
     
     def ready(self, kw):
         print "ready",kw
@@ -59,7 +67,8 @@ class Gamemanger_B(object):
             'init_room': self.init_room,
             'join_room':self.join_room,
             'ready':self.ready,
-            'outcard': self.outcard
+            'outcard': self.outcard,
+            'overroom': self.overroom
         }[kw["data"]["command"]](kw)     
 
 

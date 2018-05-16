@@ -68,7 +68,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
             self.factory.broadcast(json.dumps(
                 allplayers).encode('utf8'), pl)
 
-        elif x["command"] in ['init_room','join_room','ready','outcard']:
+        elif x["command"] in ['init_room','join_room','ready','outcard','overroom']:
             print "#####"
             self.factory.gamemanger_B.switch(data=x,conn=self)
             pass
