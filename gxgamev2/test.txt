@@ -1,3 +1,5 @@
 {"command":"join_room","roomid":88888888,"pid":2}
 {"command":"init_room","roomid":88888888,"pid":1}
 {"command":"ready","roomid":88888888,"readystat":1,"pid":1}
+
+{"command":"outcard","roomid":88888888,"pid":1,"outcard":1}

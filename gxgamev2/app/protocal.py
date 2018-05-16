@@ -47,9 +47,6 @@ class GxgServerProtocol(WebSocketServerProtocol):
             self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
         except Exception  as e:
             pass
-        # self.factory.gamemanger_A.unregister(self.transport.sessionno)
-        # self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
-        # WebSocketServerProtocol.connectionLost(self, reason)
 
     @inlineCallbacks
     def onMessage(self, payload, isBinary):
@@ -71,7 +68,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
             self.factory.broadcast(json.dumps(
                 allplayers).encode('utf8'), pl)
 
-        elif x["command"] in ['init_room','join_room','ready']:
+        elif x["command"] in ['init_room','join_room','ready','outcard']:
             print "#####"
             self.factory.gamemanger_B.switch(data=x,conn=self)
             pass

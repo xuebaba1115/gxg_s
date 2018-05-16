@@ -48,23 +48,20 @@ class Gamemanger_B(object):
         room = self.rooms[kw['data']['roomid']]
         room.readygame(kw['data'])
 
+    def outcard(self, kw):
+        print "outcard",kw
+        room = self.rooms[kw['data']['roomid']]
+        room.outcardgame(kw['data']['pid'],kw['data']['outcard'])
+
+
     def switch(self, **kw):
         return {
             'init_room': self.init_room,
             'join_room':self.join_room,
             'ready':self.ready,
+            'outcard': self.outcard
         }[kw["data"]["command"]](kw)     
 
-    # def handledata(self, json_data):
-    #     d = Deferred()
-    #     try:
-    #         self.switch(json_data)
-    #     except TypeError as e:
-    #         pass
-    #         # log.err(str(e))
-    #     d.addCallback(self.actions)
-    #     d.callback(json_data)
-    #     return d
 
 
 class mjroom(object):
@@ -74,6 +71,8 @@ class mjroom(object):
         self.roomid= roomid
         self.players={}
         self.cards=None
+        self.banker=roomroot
+        self.guicard=None
  
 
     def initplayer(self, data,conn):
@@ -99,7 +98,7 @@ class mjroom(object):
                 self.broadcast({"command":data['command'],"roomid":self.roomid,"pinfo":p.pinfo()})
             readyok+=p.readystat
         print readyok
-        if readyok==4:
+        if readyok==2:  #准备状态
             self.broadcast({"command":"startgame"})
             self.startgame()
 
@@ -113,8 +112,10 @@ class mjroom(object):
                 p.conn.sendMessage(json.dumps(msg))                     
         
     def startgame(self):
+        self.guicard=(random.randint(1,33))
+        print 'guicard',self.guicard
         self.cards=[i for i in xrange(34) for j in xrange(4)]
-        for p in self.players.values():
+        for p in self.players.values():              
             for i in xrange(13):
                 try:
                     j = self.cards.pop(random.randint(0, len(self.cards)-1))
@@ -122,6 +123,40 @@ class mjroom(object):
                 except IndexError as e:
                     print '########',e
             p.conn.sendMessage(json.dumps({"command":"gaming","pinfo":p.pinfo(["conn"])}))
+            if self.banker==p.pid:
+                self.getcard(p)
+
+    def getcard(self,p):
+        try:
+            j = self.cards.pop(random.randint(0, len(self.cards)-1))
+            p.conn.sendMessage(json.dumps({"command":"getcard","pinfo":p.pinfo(),"getcard":j}))
+            p.handcard[j] = p.handcard[j] + 1
+            if app.split.get_hu_info(p.handcard, 34, self.guicard):
+                print 'send zimohule'
+        except IndexError as e:
+            print '########',e
+
+    def outcardgame(self, pid,j):
+        for p in self.players.values():
+            if pid ==p.pid:
+                print 'zhuang',p.handcard
+                p.handcard[j] = p.handcard[j] - 1
+                print 'zhuang',p.handcard
+                continue
+            print p.handcard                                
+            tmpcards=p.handcard[:]
+            tmpcards[j]=tmpcards[j]+1
+            print tmpcards
+            try:
+                if app.split.get_hu_info(tmpcards, 34, self.guicard):
+                    print 'send zimohule'            
+                    break
+                else:
+                    print  "cat't hu" ,p.pid
+            except Exception as e:
+                print "huerror", e
+
+           
     
 
 class player(object):
