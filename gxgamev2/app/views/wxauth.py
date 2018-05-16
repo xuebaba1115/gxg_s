@@ -136,7 +136,7 @@ def creatroom():
         return jsonify(error=1,errormsg='no token')
 
     if request.method=='GET':
-         roomstat=Gamemanger_B.getroomstatus(request.args.get('roomid'))
+         roomstat=Gamemanger_B.getroomstatus(int(request.args.get('roomid')))
          return jsonify(roomstat=roomstat)
         
     sqlid = verify_auth_token(token)
