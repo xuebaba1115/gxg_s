@@ -141,7 +141,7 @@ def creatroom():
             return jsonify(roomstat=roomstat)
         except ValueError as e:
             log.msg("roomid input null",str(e))
-            pass
+            return jsonify(roomstat='please input roomid')
 
         
     sqlid = verify_auth_token(token)
