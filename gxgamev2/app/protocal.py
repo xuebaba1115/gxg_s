@@ -20,13 +20,13 @@ class GxgServerProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
         print 'onconnect'
         print("Client connecting: {}".format(request.peer))
-        tk = request.params
-        if tk.get('token'):
-            youhu = verify_auth_token(tk['token'].pop())
-            if not youhu:
-                self.dropConnection(abort=True)
-        else:
-            self.dropConnection(abort=True)
+        # tk = request.params
+        # if tk.get('token'):
+        #     youhu = verify_auth_token(tk['token'].pop())
+        #     if not youhu:
+        #         self.dropConnection(abort=True)
+        # else:
+        #     self.dropConnection(abort=True)
 
     def onOpen(self):
         print "open"
@@ -34,13 +34,21 @@ class GxgServerProtocol(WebSocketServerProtocol):
 
     def onClose(self, wasClean, code, reason):
         print "onclose"
-        self.factory.gamemanger_A.unregister(self.transport.sessionno)
-        self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
+        try:
+             self.factory.gamemanger_A.unregister(self.transport.sessionno)
+             self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
+        except Exception  as e:
+             pass
 
     def connectionLost(self, reason):
         print "connlost"
-        self.factory.gamemanger_A.unregister(self.transport.sessionno)
-        self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
+        try:
+            self.factory.gamemanger_A.unregister(self.transport.sessionno)
+            self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
+        except Exception  as e:
+            pass
+        # self.factory.gamemanger_A.unregister(self.transport.sessionno)
+        # self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
         # WebSocketServerProtocol.connectionLost(self, reason)
 
     @inlineCallbacks

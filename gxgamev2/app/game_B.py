@@ -124,9 +124,6 @@ class mjroom(object):
             p.conn.sendMessage(json.dumps({"command":"gaming","pinfo":p.pinfo(["conn"])}))
     
 
-
-        
-
 class player(object):
     def __init__(self,pid,conn,readystat=0):  #{readestat 0:没准备，1：准备}
         self.pid = pid
