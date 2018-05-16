@@ -137,8 +137,8 @@ def creatroom():
 
     if request.method=='GET':
         try:
-            roomstat=Gamemanger_B.getroomstatus(int(request.args.get('roomid')))
-            return jsonify(roomstat=roomstat)
+            error,roomstat=Gamemanger_B.getroomstatus(int(request.args.get('roomid')))
+            return jsonify(errcode=error, roomstat=roomstat)
         except ValueError as e:
             log.msg("roomid input null",str(e))
             return jsonify(roomstat='please input roomid')

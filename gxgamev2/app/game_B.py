@@ -19,11 +19,11 @@ class Gamemanger_B(object):
     def getroomstatus(self,roomid):
         print roomid
         if not roomid in self.rooms:
-            return  'roomid wuxiao'
+            return  1,'roomid wuxiao'
         elif len(self.rooms[roomid].players)==4:
-            return  'player full'
+            return  1,'player full'
         else:
-            return None            
+            return 0,roomid            
                    
     def init_room(self,kw):
         print kw,"initroom"
