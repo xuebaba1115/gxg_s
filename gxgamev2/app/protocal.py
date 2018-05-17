@@ -31,21 +31,22 @@ class GxgServerProtocol(WebSocketServerProtocol):
     def onOpen(self):
         print "open"
 
-
     def onClose(self, wasClean, code, reason):
         print "onclose"
         try:
-             self.factory.gamemanger_A.unregister(self.transport.sessionno)
-             self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
-        except Exception  as e:
-             pass
+            self.factory.gamemanger_A.unregister(self.transport.sessionno)
+            self.factory.connmanager.dropConnectionByID(
+                self.transport.sessionno)
+        except Exception as e:
+            pass
 
     def connectionLost(self, reason):
         print "connlost"
         try:
             self.factory.gamemanger_A.unregister(self.transport.sessionno)
-            self.factory.connmanager.dropConnectionByID(self.transport.sessionno)
-        except Exception  as e:
+            self.factory.connmanager.dropConnectionByID(
+                self.transport.sessionno)
+        except Exception as e:
             pass
 
     @inlineCallbacks
@@ -62,20 +63,21 @@ class GxgServerProtocol(WebSocketServerProtocol):
     def slowsquare(self, x):
         if x["command"] == "init":
             connid = self.factory.connmanager.addConnection(self)
-            pl, allplayers, selfplayers = self.factory.gamemanger_A.register(x, connid)
+            pl, allplayers, selfplayers = self.factory.gamemanger_A.register(
+                x, connid)
             pl.remove(connid)
             self.factory.connmanager.pushObjectbyconnID(selfplayers, [connid])
             self.factory.broadcast(json.dumps(
                 allplayers).encode('utf8'), pl)
 
-        elif x["command"] in ['init_room','join_room','ready','outcard','overroom']:
+        elif "pid"in x:
             print "#####"
-            self.factory.gamemanger_B.switch(data=x,conn=self)
+            self.factory.gamemanger_B.switch(data=x, conn=self)
             pass
 
         else:
             aa = yield self.factory.gamemanger_A.handledata(x)
-            if aa==None:
+            if aa == None:
                 returnValue('')
             else:
                 self.factory.broadcast(json.dumps(aa[1]).encode('utf8'), aa[0])
@@ -89,7 +91,7 @@ class GxgServerFactory(WebSocketServerFactory):
         WebSocketServerFactory.__init__(self, wsuri)
         self.connmanager = ConnectionManager()
         self.gamemanger_A = Gamemanger()
-        self.gamemanger_B =Gamemanger_B()
+        self.gamemanger_B = Gamemanger_B()
         self.tick()
 
     def tick(self):
@@ -107,5 +109,3 @@ class GxgServerFactory(WebSocketServerFactory):
 # test:
 # {"command":"init","x":100,"y":210,"name":"xlc","playerType":1,"angle":90}
 # {"command":"move","player": {"pos":{"y":500,"x":250},"connid": 1}}
-
-

@@ -3,6 +3,8 @@ from twisted.python import log
 import random
 import app.split 
 import json
+from app.models.users_models import User, WXUser
+from app import db
 
 
 class Gamemanger_B(object):
@@ -47,6 +49,9 @@ class Gamemanger_B(object):
         if kw['data']['roomid'] in self.rooms:
             room = self.rooms[kw['data']['roomid']]
             if room.roomroot==kw['data']['pid']:
+                us = WXUser.query.filter_by(id=kw['data']['pid']).first()
+                us.roomid=None  
+                db.session.commit() 
                 for p in room.players.values():
                     p.conn.dropConnection(abort=True)
                 del self.rooms[kw['data']['roomid']]
