@@ -87,8 +87,10 @@ class mjroom(object):
         self.cards=None
         self.banker=roomroot
         self.guicard=None
+        self.roomonly=[1,2]
+        
  
-
+        
     def initplayer(self, data,conn):
         print data,"initplayer"
         if len(self.players) == 4:
@@ -98,7 +100,7 @@ class mjroom(object):
             oldp.conn.dropConnection(abort=True)
             oldp.conn=conn
         else:
-            _play=player(data['pid'],conn)
+            _play=player(data['pid'],conn,onlyone=self.roomonly.pop(random.randint(0,len(self.roomonly)-1)))
             self.players[_play.pid]=_play
             self.broadcast({"command":data['command'],"pinfo":[_play.pinfo()]},[_play.pid])
             _play.conn.sendMessage( json.dumps({"command":data['command'],"pinfo":[p.pinfo() for p in self.players.values()]}))
@@ -153,9 +155,10 @@ class mjroom(object):
     def outcardgame(self, pid,j):
         for p in self.players.values():
             if pid ==p.pid:
-                print 'zhuang',p.handcard
+                print 'nowout',p.handcard
                 p.handcard[j] = p.handcard[j] - 1
-                print 'zhuang',p.handcard
+                pre_p=p.onlyone
+                print 'nowout',p.handcard
                 continue
             print p.handcard                                
             tmpcards=p.handcard[:]
@@ -169,16 +172,32 @@ class mjroom(object):
                     print  "cat't hu" ,p.pid
             except Exception as e:
                 print "huerror", e
+        nextout_p=self._nextoutcard(pre_p)  
+        # print nextout_p.info()
+        try:
+            j = self.cards.pop(random.randint(0, len(self.cards)-1))
+            nextout_p.conn.sendMessage(json.dumps({"command":"getcard","pinfo":nextout_p.pinfo(),"getcard":j}))
+            nextout_p.handcard[j] = nextout_p.handcard[j] + 1
+            if app.split.get_hu_info(nextout_p.handcard, 34, self.guicard):
+                print 'send zimohule'
+        except IndexError as e:
+            print '########',e         
+             
 
-           
+    def _nextoutcard(self, pre):
+        c=pre%2+1
+        for p in self.players.values():
+            if c==p.onlyone:                          
+                return p
     
 
 class player(object):
-    def __init__(self,pid,conn,readystat=0):  #{readestat 0:没准备，1：准备}
+    def __init__(self,pid,conn,readystat=0,onlyone=-1):  #{readestat 0:没准备，1：准备}
         self.pid = pid
         self.conn= conn
         self.readystat= readystat
         self.handcard=[0 for i in xrange(34)]
+        self.onlyone=onlyone
 
 
     def pinfo(self,items=None):
