@@ -71,7 +71,6 @@ class GxgServerProtocol(WebSocketServerProtocol):
                 allplayers).encode('utf8'), pl)
 
         elif "pid"in x:
-            print "#####"
             self.factory.gamemanger_B.switch(data=x, conn=self)
             pass
 

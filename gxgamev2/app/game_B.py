@@ -137,7 +137,7 @@ class mjroom(object):
                     j = self.cards.pop(random.randint(0, len(self.cards)-1))
                     p.handcard[j] = p.handcard[j] + 1
                 except IndexError as e:
-                    print '########',e
+                    print '########s',e
             p.conn.sendMessage(json.dumps({"command":"gaming","pinfo":p.pinfo(["conn"])}))
             if self.banker==p.pid:
                 self.getcard(p)
@@ -150,7 +150,7 @@ class mjroom(object):
             if app.split.get_hu_info(p.handcard, 34, self.guicard):
                 print 'send zimohule'
         except IndexError as e:
-            print '########',e
+            print '########g',e
 
     def outcardgame(self, pid,j):
         for p in self.players.values():
@@ -160,28 +160,35 @@ class mjroom(object):
                 pre_p=p.onlyone
                 print 'nowout',p.handcard
                 continue
-            print p.handcard                                
+            print p.handcard,'soure card'                              
             tmpcards=p.handcard[:]
             tmpcards[j]=tmpcards[j]+1
-            print tmpcards
+            print tmpcards,'jia1 card'
             try:
                 if app.split.get_hu_info(tmpcards, 34, self.guicard):
                     print 'send zimohule'            
                     break
-                else:
-                    print  "cat't hu" ,p.pid
+                elif app.split.get_peng(j,p.handcard)=="peng":
+                    print "peng"
+                    p.conn.sendMessage(json.dumps({"command":"peng","pinfo":p.pinfo(),"pengcard":j}))
+                    return
+                elif app.split.get_peng(j,p.handcard)=="gang":
+                    print "gang"
+                    p.conn.sendMessage(json.dumps({"command":"gang","pinfo":p.pinfo(),"gangcard":j}))
+                    return                  
             except Exception as e:
                 print "huerror", e
         nextout_p=self._nextoutcard(pre_p)  
         # print nextout_p.info()
         try:
-            j = self.cards.pop(random.randint(0, len(self.cards)-1))
-            nextout_p.conn.sendMessage(json.dumps({"command":"getcard","pinfo":nextout_p.pinfo(),"getcard":j}))
-            nextout_p.handcard[j] = nextout_p.handcard[j] + 1
+            i = self.cards.pop(random.randint(0, len(self.cards)-1))
+            nextout_p.conn.sendMessage(json.dumps({"command":"getcard","pinfo":nextout_p.pinfo(),"getcard":i}))
+            nextout_p.handcard[i] = nextout_p.handcard[i] + 1
+            print nextout_p.handcard
             if app.split.get_hu_info(nextout_p.handcard, 34, self.guicard):
                 print 'send zimohule'
         except IndexError as e:
-            print '########',e         
+            print '########o',e         
              
 
     def _nextoutcard(self, pre):

@@ -215,3 +215,11 @@ def two(n, need_gui, max_gui):
 	   return need_gui
 
 	return next_split(n, need_gui, max_gui)
+
+def get_peng(card,hand_cards):
+	print hand_cards[card],'get_peng'
+	if hand_cards[card] ==3:
+		return "gang"
+	elif hand_cards[card]==2:
+		return "peng"
+		
