@@ -64,7 +64,17 @@ class Gamemanger_B(object):
     def outcard(self, kw):
         print "outcard",kw
         room = self.rooms[kw['data']['roomid']]
-        room.outcardgame(kw['data']['pid'],kw['data']['outcard'])
+        room.outcardgame(kw['data']['pid'],kw['data']['outcard'],kw['data']['pre_p'])
+
+    def peng(self, kw):
+        print "peng",kw
+        room = self.rooms[kw['data']['roomid']]        
+        room.penggame(kw['data']['pid'],kw['data']['pengcard'],kw['data']['pre_p']) 
+
+    def gang(self, kw):
+        print "gang",kw
+        room = self.rooms[kw['data']['roomid']]        
+        room.ganggame(kw['data']['pid'],kw['data']['ganggcard'],kw['data']['pre_p'])             
 
 
     def switch(self, **kw):
@@ -73,7 +83,9 @@ class Gamemanger_B(object):
             'join_room':self.join_room,
             'ready':self.ready,
             'outcard': self.outcard,
-            'overroom': self.overroom
+            'overroom': self.overroom,
+            'peng':self.peng,
+            'gang':self.gang
         }[kw["data"]["command"]](kw)     
 
 
@@ -152,12 +164,11 @@ class mjroom(object):
         except IndexError as e:
             print '########g',e
 
-    def outcardgame(self, pid,j):
+    def outcardgame(self, pid,j,pre_p):
         for p in self.players.values():
             if pid ==p.pid:
                 print 'nowout',p.handcard
                 p.handcard[j] = p.handcard[j] - 1
-                pre_p=p.onlyone
                 print 'nowout',p.handcard
                 continue
             print p.handcard,'soure card'                              
@@ -167,35 +178,58 @@ class mjroom(object):
             try:
                 if app.split.get_hu_info(tmpcards, 34, self.guicard):
                     print 'send zimohule'            
-                    break
+                    return
                 elif app.split.get_peng(j,p.handcard)=="peng":
                     print "peng"
-                    p.conn.sendMessage(json.dumps({"command":"peng","pinfo":p.pinfo(),"pengcard":j}))
+                    p.conn.sendMessage(json.dumps({"command":"peng","pinfo":p.pinfo(),"pengcard":j,"ppre":pre_p}))
                     return
                 elif app.split.get_peng(j,p.handcard)=="gang":
                     print "gang"
-                    p.conn.sendMessage(json.dumps({"command":"gang","pinfo":p.pinfo(),"gangcard":j}))
+                    p.conn.sendMessage(json.dumps({"command":"gang","pinfo":p.pinfo(),"gangcard":j,"ppre":pre_p}))
                     return                  
             except Exception as e:
                 print "huerror", e
-        nextout_p=self._nextoutcard(pre_p)  
+        self._nextoutcard(pre_p)  
         # print nextout_p.info()
-        try:
-            i = self.cards.pop(random.randint(0, len(self.cards)-1))
-            nextout_p.conn.sendMessage(json.dumps({"command":"getcard","pinfo":nextout_p.pinfo(),"getcard":i}))
-            nextout_p.handcard[i] = nextout_p.handcard[i] + 1
-            print nextout_p.handcard
-            if app.split.get_hu_info(nextout_p.handcard, 34, self.guicard):
-                print 'send zimohule'
-        except IndexError as e:
-            print '########o',e         
-             
+        # try:
+        #     i = self.cards.pop(random.randint(0, len(self.cards)-1))
+        #     nextout_p.conn.sendMessage(json.dumps({"command":"getcard","pinfo":nextout_p.pinfo(),"getcard":i}))
+        #     nextout_p.handcard[i] = nextout_p.handcard[i] + 1
+        #     print nextout_p.handcard
+        #     if app.split.get_hu_info(nextout_p.handcard, 34, self.guicard):
+        #         print 'send zimohule'
+        # except IndexError as e:
+        #     print '########o',e         
+
+    def penggame(self,pid,j,ppre):
+        if j=='guo':
+            self._nextoutcard(ppre)
+        else:
+            p=self.players.get(pid)
+            p.handcard[j]=p.handcard[j]+1
+          
+
+    def ganggame(self,pid,j,ppre):
+        if j=='guo':
+            self._nextoutcard(ppre)
+        else:
+            p=self.players.get(pid)
+            p.handcard[j]=p.handcard[j]+1           
 
     def _nextoutcard(self, pre):
         c=pre%2+1
         for p in self.players.values():
-            if c==p.onlyone:                          
-                return p
+            if c==p.onlyone:  
+                try:
+                    i = self.cards.pop(random.randint(0, len(self.cards)-1))
+                    p.conn.sendMessage(json.dumps({"command":"getcard","pinfo":p.pinfo(),"getcard":i}))
+                    p.handcard[i] = p.handcard[i] + 1
+                    print p.handcard
+                    if app.split.get_hu_info(p.handcard, 34, self.guicard):
+                        print 'send zimohule'
+                except IndexError as e:
+                    print '########o',e                                           
+                # return p
     
 
 class player(object):
