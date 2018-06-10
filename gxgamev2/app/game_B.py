@@ -150,7 +150,7 @@ class mjroom(object):
                     p.handcard[j] = p.handcard[j] + 1
                 except IndexError as e:
                     print '########s',e
-            p.conn.sendMessage(json.dumps({"command":"gaming","pinfo":p.pinfo(["conn"])}))
+            p.conn.sendMessage(json.dumps({"command":"gaming","pinfo":p.pinfo(["conn"]),"guicard":self.guicard}))
             if self.banker==p.pid:
                 self.getcard(p)
 
