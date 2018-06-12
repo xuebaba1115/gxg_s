@@ -219,12 +219,10 @@ def two(n, need_gui, max_gui):
 ##peng,chi,gang,
 def get_peng(card,hand_cards,pcg):
 	v_card=hand_cards[:]
-	if  pcg:
-		for k in pcg.values():
-			for j in k:
-				for jj in j:
-					v_card[jj]=v_card[jj]-1	
-		
+	for k in pcg.values():
+		for j in k:
+			for jj in j:
+				v_card[jj]=v_card[jj]-1	
 	print v_card[card],'get_peng',v_card
 	if v_card[card] ==3:
 		return "gang_peng"
@@ -234,11 +232,10 @@ def get_peng(card,hand_cards,pcg):
 
 def chi(card,hand_cards,pcg):
 	v_card=hand_cards[:]
-	if  pcg:
-		for k in pcg.values():
-			for j in k:
-				for jj in j:
-					v_card[jj]=v_card[jj]-1				
+	for k in pcg.values():
+		for j in k:
+			for jj in j:
+				v_card[jj]=v_card[jj]-1				
 	chilist=[]
 	if card<27:
 		for i in check_chi(card,v_card):

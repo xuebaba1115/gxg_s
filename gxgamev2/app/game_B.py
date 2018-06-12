@@ -195,16 +195,7 @@ class mjroom(object):
             except Exception as e:                
                 print "huerror", e
         self._nextoutcard(pre_p,chicard=j)  
-        # print nextout_p.info()
-        # try:
-        #     i = self.cards.pop(random.randint(0, len(self.cards)-1))
-        #     nextout_p.conn.sendMessage(json.dumps({"command":"getcard","pinfo":nextout_p.pinfo(),"getcard":i}))
-        #     nextout_p.handcard[i] = nextout_p.handcard[i] + 1
-        #     print nextout_p.handcard
-        #     if app.split.get_hu_info(nextout_p.handcard, 34, self.guicard):
-        #         print 'send zimohule'
-        # except IndexError as e:
-        #     print '########o',e         
+ 
 
     def penggame(self,pid,j,ppre):
         if j=='guo':
