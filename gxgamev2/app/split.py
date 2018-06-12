@@ -216,18 +216,32 @@ def two(n, need_gui, max_gui):
 
 	return next_split(n, need_gui, max_gui)
 
-def get_peng(card,hand_cards):
-	print hand_cards[card],'get_peng'
-	if hand_cards[card] ==3:
+##peng,chi,gang,
+def get_peng(card,hand_cards,pcg):
+	v_card=hand_cards[:]
+	if  pcg:
+		for k in pcg.values():
+			for j in k:
+				for jj in j:
+					v_card[jj]=v_card[jj]-1	
+		
+	print v_card[card],'get_peng',v_card
+	if v_card[card] ==3:
 		return "gang_peng"
-	elif hand_cards[card]==2:
+	elif v_card[card]==2:
 		return "peng"
 
 
-def chi(card,hand_cards):
+def chi(card,hand_cards,pcg):
+	v_card=hand_cards[:]
+	if  pcg:
+		for k in pcg.values():
+			for j in k:
+				for jj in j:
+					v_card[jj]=v_card[jj]-1				
 	chilist=[]
 	if card<27:
-		for i in check_chi(card,hand_cards):
+		for i in check_chi(card,v_card):
 			if i:
 				chilist.append(i)
 		print chilist,"app.chi"				
@@ -242,6 +256,7 @@ def check_chi(card,hand_cards):
 	chicard2=[card,card-1,card-2] if c1+c2==2 else None				
 	chicard3=[card,card-1,card+1] if c1+c3==2 else None		
 	if card%9==0:
+		print chicard1	
 		return chicard1,None
 	elif card%9==8:
 		return chicard2,None		

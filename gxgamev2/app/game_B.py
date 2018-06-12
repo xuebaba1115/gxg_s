@@ -79,7 +79,7 @@ class Gamemanger_B(object):
     def chi(self, kw):
         print "chi",kw
         room = self.rooms[kw['data']['roomid']]        
-        room.chigame(kw['data']['pid'],kw['data']['chicard']) 
+        room.chigame(kw['data']['pid'],kw['data']['chicard'],kw['data']['chilist']) 
 
     def switch(self, **kw):
         return {
@@ -176,19 +176,19 @@ class mjroom(object):
                 p.handcard[j] = p.handcard[j] - 1
                 print 'nowout',p.handcard
                 continue
-            print p.handcard,'soure card'                              
+            print 'soure card',p.handcard                             
             tmpcards=p.handcard[:]
             tmpcards[j]=tmpcards[j]+1
-            print tmpcards,'jia1 card'
+            print 'tmp   card',tmpcards
             try:
                 if app.split.get_hu_info(tmpcards, 34, self.guicard):
                     print 'send zimohule'            
                     return
-                elif app.split.get_peng(j,p.handcard)=="peng":
+                elif app.split.get_peng(j,p.handcard,p.pcg_list)=="peng":
                     print "peng"
                     p.conn.sendMessage(json.dumps({"command":"peng","pinfo":p.pinfo(),"pengcard":j,"ppre":pre_p}))
                     return
-                elif app.split.get_peng(j,p.handcard)=="gang_peng":
+                elif app.split.get_peng(j,p.handcard,p.pcg_list)=="gang_peng":
                     print "gang_peng"
                     p.conn.sendMessage(json.dumps({"command":"gang","pinfo":p.pinfo(),"gangcard":j,"ppre":pre_p}))
                     return                  
@@ -212,23 +212,26 @@ class mjroom(object):
         else:
             p=self.players.get(pid)
             p.handcard[j]=p.handcard[j]+1
-            self.broadcast({{"command":"other_peng","pinfo":p.pinfo(),"pengcard":j}},passpid=[p.pid])
+            p.pcg_list['peng'].append([j]*3)
+            self.broadcast({"command":"other_peng","pinfo":p.pinfo(),"pengcard":j},passpid=[p.pid])
           
     def ganggame(self,pid,j,ppre):
         if j=='guo':
             self._nextoutcard(ppre)
         else:
             p=self.players.get(pid)
-            p.handcard[j]=p.handcard[j]+1     
-            self.broadcast({{"command":"other_gang","pinfo":p.pinfo(),"pengcard":j}},passpid=[p.pid])      
+            p.handcard[j]=p.handcard[j]+1  
+            p.pcg_list['gang'].append([j]*4)   
+            self.broadcast({"command":"other_gang","pinfo":p.pinfo(),"gangcard":j},passpid=[p.pid])      
 
-    def chigame(self, pid,j):
+    def chigame(self, pid,j,jlist):
         p=self.players.get(pid)
         if j=='guo':
             self._nextoutcard(p.onlyone-1)
         else:
-            p.handcard[j]=p.handcard[j]+1     
-            self.broadcast({"command":"other_chi","pinfo":p.pinfo(),"pengcard":j},passpid=[p.pid])                   
+            p.handcard[j]=p.handcard[j]+1    
+            p.pcg_list['chi'].append(jlist)
+            self.broadcast({"command":"other_chi","pinfo":p.pinfo(),"chicard":j},passpid=[p.pid])                   
 
     def _nextoutcard(self, pre,chicard=None):
         c=pre%2+1
@@ -236,7 +239,7 @@ class mjroom(object):
             if c==p.onlyone:  
                 try:
                     if chicard:
-                        chicard = app.split.chi(chicard,p.handcard)
+                        chicard = app.split.chi(chicard,p.handcard,p.pcg_list)
                         if chicard:
                             p.conn.sendMessage(json.dumps({"command":"chicard","pinfo":p.pinfo(),"chicard":chicard}))   
                             return    
@@ -247,11 +250,12 @@ class mjroom(object):
                     i = self.cards.pop(random.randint(0, len(self.cards)-1))
                     p.conn.sendMessage(json.dumps({"command":"getcard","pinfo":p.pinfo(),"getcard":i}))
                     p.handcard[i] = p.handcard[i] + 1
-                    print p.handcard
+                    print 'nextcard,end',p.handcard
                     if app.split.get_hu_info(p.handcard, 34, self.guicard):
                         print 'send zimohule'
                 except IndexError as e:
-                    print '########o',e                                           
+                    print '########o',e   
+                break                                            
     
 
 class player(object):
@@ -261,7 +265,7 @@ class player(object):
         self.readystat= readystat
         self.handcard=[0 for i in xrange(34)]
         self.onlyone=onlyone
-
+        self.pcg_list={'chi':[],'peng':[],'gang':[]}
 
     def pinfo(self,items=None):
         info={}

@@ -5,7 +5,13 @@
 {"command":"ready","roomid":88888888,"readystat":1,"pid":1}
 
 {"command":"outcard","roomid":88888888,"pid":1,"outcard":1,"pre_p":1}
-{"command":"chi","roomid":88888888,"pid":1,"chicard":1}
+
+{"command":"chi","roomid":88888888,"pid":1,"chicard":1,"chilist":[1,2,3]}
 
 {"command":"peng","roomid":88888888,"pid":1,"pengcard":1,"pre_p":1}
       <pre id="log" style="height: 20em; overflow-y: scroll;"></pre>
+
+
+[1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 
+ 1, 1, 0, 1, 2, 2, 1, 1, 0, 1,
+ 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
