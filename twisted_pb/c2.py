@@ -9,11 +9,6 @@ from twisted.spread import pb
 from twisted.internet import reactor
 
 
-
-
-    
-        
-
 def main():
     factory = pb.PBClientFactory()
     reactor.connectTCP("localhost", 8800, factory)
@@ -22,8 +17,9 @@ def main():
     reactor.run()
 
 def got_obj(obj):
-    cc=obj.callRemote("callTarget", "gate")
+    cc=obj.callRemote("callTarget", "gate","print")
     cc.addCallback(lambda a: print(a))
-    print (cc)
+    cc.addCallback(lambda a: reactor.stop())
+
 
 main()

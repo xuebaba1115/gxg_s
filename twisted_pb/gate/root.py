@@ -6,10 +6,7 @@ Created on 2011-10-14
 """
 from twisted.python import log
 from twisted.spread import pb
-
-
-
-
+import random
 
 class BilateralBroker(pb.Broker):
 
@@ -31,30 +28,25 @@ class PBRoot(pb.Root):
         """
         pb.Root()
         self.child={}
-        
-
-
 
     def addServiceChannel(self,service):
-        """添加服务通道
-        @param service: Service Object(In bilateral.services)
-        """
         self.service = service
 
     def remote_register(self,name,peer):
-        """设置代理通道
-        @param addr: (hostname,port)hostname 根节点的主机名,根节点的端口
-        """
         log.msg('node [%s] registered' % name)
         print name,peer
-        # self.childsmanager.addChildByNamePeer(name,peer)
-        self.child[name]=peer
-        
+        cclass=self.child.get(name)
+        if not cclass:
+            self.child[name]=[peer]            
+        else:
+            cclass.append(peer)
+        print self.child            
 
     def remote_callTarget(self,name,*args,**kw):
         ch=self.child.get(name)
         if ch:
-            data = ch.callRemote('print',*args,**kw)
+            witchone=ch[random.randint(0,len(ch)-1)]
+            data = witchone.callRemote(*args,**kw)
             return data
 
 
