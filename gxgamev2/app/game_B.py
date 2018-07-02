@@ -104,13 +104,15 @@ class mjroom(object):
         self.cards=None
         self.banker=roomroot
         self.guicard=None
-        self.roomonly=[1,2]
+        self.maxplayer=2
+        self.roomonly=range(1,self.maxplayer+1)
+        
         
  
         
     def initplayer(self, data,conn):
         print data,"initplayer"
-        if len(self.players) == 4:
+        if len(self.players) == self.maxplayer:
             raise Exception("player ge 4")  
         if data['pid'] in self.players:   #断线
             oldp=self.players.get(data['pid'])
@@ -131,7 +133,7 @@ class mjroom(object):
                 self.broadcast({"command":data['command'],"roomid":self.roomid,"pinfo":p.pinfo()})
             readyok+=p.readystat
         print readyok
-        if readyok==2:  #准备状态
+        if readyok==self.maxplayer:  #准备状态
             self.broadcast({"command":"startgame"})
             self.startgame()
 
@@ -172,29 +174,39 @@ class mjroom(object):
     def outcardgame(self, pid,j,pre_p):
         for p in self.players.values():
             if pid ==p.pid:
-                print 'nowout',p.handcard
+                print 'nowout_qai',p.handcard
                 p.handcard[j] = p.handcard[j] - 1
-                print 'nowout',p.handcard
+                print 'nowout_hou',p.handcard
                 continue
             print 'soure card',p.handcard                             
             tmpcards=p.handcard[:]
             tmpcards[j]=tmpcards[j]+1
             print 'tmp   card',tmpcards
             try:
+                c_action=[]
+                c=pre_p%self.maxplayer+1
                 if app.split.get_hu_info(tmpcards, 34, self.guicard):
+                    c_action.append('h')
                     print 'send zimohule'            
-                    return
-                elif app.split.get_peng(j,p.handcard,p.pcg_list)=="peng":
+                if app.split.get_peng(j,p.handcard,p.pcg_list)=="peng":
                     print "peng"
-                    p.conn.sendMessage(json.dumps({"command":"peng","pinfo":p.pinfo(),"pengcard":j,"ppre":pre_p}))
-                    return
-                elif app.split.get_peng(j,p.handcard,p.pcg_list)=="gang_peng":
+                    c_action.append('p')
+                if app.split.get_peng(j,p.handcard,p.pcg_list)=="gang_peng":
                     print "gang_peng"
-                    p.conn.sendMessage(json.dumps({"command":"gang","pinfo":p.pinfo(),"gangcard":j,"ppre":pre_p}))
-                    return                  
+                    c_action.append('gp')  
+                if p.onlyone== c:
+                    chicard = app.split.chi(j,p.handcard,p.pcg_list)
+                    if chicard:
+                        print "chi"
+                        c_action.append('c')   
+                if c_action and p.onlyone==c:
+                    p.conn.sendMessage(json.dumps({"command":"gpch","c_action":c_action,"indexcard":j,"chicard":chicard,"ppre_p":pre_p}))          
+                elif c_action:
+                    p.conn.sendMessage(json.dumps({"command":"gpch","c_action":c_action,"indexcard":j,"ppre_p":pre_p}))                       
             except Exception as e:                
                 print "huerror", e
-        self._nextoutcard(pre_p,chicard=j)  
+        if not c_action:                
+            self._nextoutcard(pre_p)  
  
 
     def penggame(self,pid,j,ppre):
@@ -224,19 +236,10 @@ class mjroom(object):
             p.pcg_list['chi'].append(jlist)
             self.broadcast({"command":"other_chi","pinfo":p.pinfo(),"chicard":j},passpid=[p.pid])                   
 
-    def _nextoutcard(self, pre,chicard=None):
-        c=pre%2+1
+    def _nextoutcard(self, pre):
+        c=pre%self.maxplayer+1
         for p in self.players.values():
-            if c==p.onlyone:  
-                try:
-                    if chicard:
-                        chicard = app.split.chi(chicard,p.handcard,p.pcg_list)
-                        if chicard:
-                            p.conn.sendMessage(json.dumps({"command":"chicard","pinfo":p.pinfo(),"chicard":chicard}))   
-                            return    
-                except Exception as e:    
-                    print e,"chierror"
-                    pass                                     
+            if c==p.onlyone:                                     
                 try:
                     i = self.cards.pop(random.randint(0, len(self.cards)-1))
                     p.conn.sendMessage(json.dumps({"command":"getcard","pinfo":p.pinfo(),"getcard":i}))

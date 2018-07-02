@@ -9,6 +9,7 @@
 {"command":"chi","roomid":88888888,"pid":1,"chicard":1,"chilist":[1,2,3]}
 
 {"command":"peng","roomid":88888888,"pid":1,"pengcard":1,"pre_p":1}
+
       <pre id="log" style="height: 20em; overflow-y: scroll;"></pre>
 
 
