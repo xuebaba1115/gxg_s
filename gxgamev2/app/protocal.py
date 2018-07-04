@@ -52,12 +52,12 @@ class GxgServerProtocol(WebSocketServerProtocol):
     @inlineCallbacks
     def onMessage(self, payload, isBinary):
         if not isBinary:
-            try:
-                x = json.loads(payload.decode('utf8'))
-                res = yield self.slowsquare(x)
-            except Exception as e:
-                self.sendMessage(json.dumps(
-                    {"errcode": 1, "errmsg": "%s" % e}).encode('utf8'))
+            # try:
+            x = json.loads(payload.decode('utf8'))
+            res = yield self.slowsquare(x)
+            # except Exception as e:
+                # self.sendMessage(json.dumps(
+                    # {"errcode": 1, "errmsg": "%s" % e}).encode('utf8'))
 
     @inlineCallbacks
     def slowsquare(self, x):
@@ -68,8 +68,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
             pl.remove(connid)
             self.factory.connmanager.pushObjectbyconnID(selfplayers, [connid])
             self.factory.broadcast(json.dumps(
-                allplayers).encode('utf8'), pl)
-
+                allplayers).encode('utf8'), pl)            
         elif "pid"in x:
             self.factory.gamemanger_B.switch(data=x, conn=self)
             pass

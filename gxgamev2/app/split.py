@@ -223,12 +223,22 @@ def get_peng(card,hand_cards,pcg):
 		for j in k:
 			for jj in j:
 				v_card[jj]=v_card[jj]-1	
-	print v_card[card],'get_peng',v_card
-	if v_card[card] ==3:
-		return "gang_peng"
-	elif v_card[card]==2:
+	if v_card[card]==2:
 		return "peng"
+	return None
 
+def get_gang(card,hand_cards,pcg):
+	v_card=hand_cards[:]
+	for k,v in pcg.items():
+		if k=='peng' and card in v:
+			return "+gang" 
+		if v:
+			for j in v:
+				for i in j:
+					v_card[i]=v_card[i]-1				
+	if v_card[card]==3:
+		return "angang_peng"
+	return None		
 
 def chi(card,hand_cards,pcg):
 	v_card=hand_cards[:]
@@ -241,7 +251,7 @@ def chi(card,hand_cards,pcg):
 		for i in check_chi(card,v_card):
 			if i:
 				chilist.append(i)
-		print chilist,"app.chi"				
+		print chilist,"app.chi_list"				
 		return chilist
 
 def check_chi(card,hand_cards):
