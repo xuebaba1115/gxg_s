@@ -217,8 +217,9 @@ def two(n, need_gui, max_gui):
 	return next_split(n, need_gui, max_gui)
 
 ##peng,chi,gang,
-def get_peng(card,hand_cards,pcg):
+def get_peng(card,hand_cards,pcg,guiid):
 	v_card=hand_cards[:]
+	v_card[guiid]=0
 	for k in pcg.values():
 		for j in k:
 			for jj in j:
@@ -227,8 +228,9 @@ def get_peng(card,hand_cards,pcg):
 		return "peng"
 	return None
 
-def get_gang(card,hand_cards,pcg):
+def get_gang(card,hand_cards,pcg,guiid):
 	v_card=hand_cards[:]
+	v_card[guiid]=0
 	for k,v in pcg.items():
 		if k=='peng' and card in v:
 			return "+gang" 
@@ -240,8 +242,9 @@ def get_gang(card,hand_cards,pcg):
 		return "angang_peng"
 	return None		
 
-def chi(card,hand_cards,pcg):
+def chi(card,hand_cards,pcg,guiid):
 	v_card=hand_cards[:]
+	v_card[guiid]=0
 	for k in pcg.values():
 		for j in k:
 			for jj in j:

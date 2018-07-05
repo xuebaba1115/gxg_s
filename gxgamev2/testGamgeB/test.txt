@@ -10,9 +10,47 @@
 
 {"command":"peng","roomid":88888888,"pid":1,"pengcard":1,"pre_p":1}
 
+{"command":"gang","roomid":88888888,"pid":1,"gangcard":1,"pre_p":1}
+
       <pre id="log" style="height: 20em; overflow-y: scroll;"></pre>
 
 
 [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 
  1, 1, 0, 1, 2, 2, 1, 1, 0, 1,
  1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+[0, 0, 1, 0, 0, 0, 0, 1, 0,
+ 0, 0, 1, 0, 0, 0, 0, 0, 1,
+ 0, 1, 0, 1, 0, 2, 0, 0, 0,
+ 1, 1, 0, 0, 0, 2, 1]
+
+
+
+ 2018-07-05 09:51:07+0800 [-] Unhandled Error
+        Traceback (most recent call last):
+          File "/usr/local/lib/python2.7/dist-packages/twisted/internet/defer.py", line 1532, in unwindGenerator
+            return _inlineCallbacks(None, gen, Deferred())
+          File "/usr/local/lib/python2.7/dist-packages/twisted/internet/defer.py", line 1386, in _inlineCallbacks
+            result = g.send(result)
+          File "/home/dev/my-pypy-env/gxg_s/gxgamev2/app/protocal.py", line 57, in onMessage
+            res = yield self.slowsquare(x)
+          File "/usr/local/lib/python2.7/dist-packages/twisted/internet/defer.py", line 1532, in unwindGenerator
+            return _inlineCallbacks(None, gen, Deferred())
+        --- <exception caught here> ---
+          File "/usr/local/lib/python2.7/dist-packages/twisted/internet/defer.py", line 1386, in _inlineCallbacks
+            result = g.send(result)
+          File "/home/dev/my-pypy-env/gxg_s/gxgamev2/app/protocal.py", line 73, in slowsquare
+            self.factory.gamemanger_B.switch(data=x, conn=self)
+          File "/home/dev/my-pypy-env/gxg_s/gxgamev2/app/game_B.py", line 100, in switch
+            }[kw["data"]["command"]](kw)
+          File "/home/dev/my-pypy-env/gxg_s/gxgamev2/app/game_B.py", line 70, in outcard
+            ['outcard'], kw['data']['pre_p'])
+          File "/home/dev/my-pypy-env/gxg_s/gxgamev2/app/game_B.py", line 197, in outcardgame
+            self._nextoutcard(pre_p)
+          File "/home/dev/my-pypy-env/gxg_s/gxgamev2/app/game_B.py", line 299, in _nextoutcard
+            i = self.cards.pop(random.randint(0, len(self.cards) - 1))
+          File "/usr/lib/python2.7/random.py", line 242, in randint
+            return self.randrange(a, b+1)
+          File "/usr/lib/python2.7/random.py", line 218, in randrange
+            raise ValueError, "empty range for randrange() (%d,%d, %d)" % (istart, istop, width)
+        exceptions.ValueError: empty range for randrange() (0,0, 0)
