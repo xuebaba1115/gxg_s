@@ -41,16 +41,17 @@ class EchoClientProtocol(WebSocketClientProtocol):
             print 'pid:', options.pid, 'onlyone:', self.onlyone
             self.sendMessage(json.dumps(
                 {"command": "ready", "roomid": 88888888, "readystat": 1, "pid": options.pid}))
+
         if x['command'] == 'gaming':
             for i in x['pinfo']:
                 if i == 'handcard':
                     self.handcards = x['pinfo'][i]
             self.handcards[x['guicard']] = 0
             print '##guicard', x['guicard']
+
         if x['command'] == 'getcard':
             time.sleep(timespeed)
             print '##get_card,outcard', x['getcard']
-            # reactor.callLater(3,self.sendMessage,json.dumps({"command":"outcard","roomid":88888888,"pid":options.pid,"outcard":x['getcard'],"pre_p":self.onlyone}))
             self.sendMessage(json.dumps({"command": "outcard", "roomid": 88888888,
                                          "pid": options.pid, "outcard": x['getcard'], "pre_p": self.onlyone}))
 
@@ -58,8 +59,9 @@ class EchoClientProtocol(WebSocketClientProtocol):
             for i in x['c_action']:
                 print '##get_gpch', i, x['indexcard']
                 if i == 'hu':
+                    self.sendMessage(json.dumps({"command":"hu", "roomid": 88888888,"hucard":x['indexcard'],"pid":options.pid}))
                     print 'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh'
-                    reactor.stop()
+                    reactor.callLater(1,reactor.stop)
 
                 if i == 'minggang_peng':
                     time.sleep(timespeed)
@@ -101,14 +103,20 @@ class EchoClientProtocol(WebSocketClientProtocol):
                         print '##chi out', sjcard
                         break
 
-        if x['command'] == 'nocard' :       
-            print 'nocard'
+        if x['command'] == 'other_hu':
             if self.root:
                 self.sendMessage(json.dumps({"command":"overroom","roomid":88888888,"pid":options.pid}))  
                 reactor.callLater(1,reactor.stop)
-                # reactor.stop()
             else:
-                reactor.stop()                
+                reactor.callLater(1,reactor.stop)
+
+        if x['command'] == 'nocard' :       
+            print 'nocard######################'
+            time.sleep(timespeed+2)
+            self.handcards = None
+            self.sendMessage(json.dumps(
+                {"command": "ready", "roomid": 88888888, "readystat": 1, "pid": options.pid}))            
+               
                                                                                   
 
     def suijicard(self):
@@ -124,7 +132,7 @@ class EchoClientProtocol(WebSocketClientProtocol):
 if __name__ == '__main__':
 
     log.startLogging(sys.stdout)
-    timespeed = 0.2
+    timespeed = 0.5
     parser = OptionParser()
     parser.add_option("-u", "--url", dest="url",
                       help="The WebSocket URL", default="wss://192.168.1.16:9000")
