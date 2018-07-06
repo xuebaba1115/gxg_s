@@ -92,6 +92,11 @@ class Gamemanger_B(object):
         room = self.rooms[kw['data']['roomid']]
         room.hugame(kw['data']['pid'],kw['data']['hucard'])
 
+    def guo(self, kw):
+        print "guo",kw
+        room = self.rooms[kw['data']['roomid']]      
+        room.guogame(kw['data']['pid'], kw['data']['pre_p'])          
+
     def switch(self, **kw):
         return {
             'init_room': self.init_room,
@@ -102,7 +107,8 @@ class Gamemanger_B(object):
             'peng': self.peng,
             'gang': self.gang,
             'chi': self.chi,
-            'hu':self.hu
+            'hu':self.hu,
+            'guo':self.guo
         }[kw["data"]["command"]](kw)
 
 
@@ -267,63 +273,49 @@ class mjroom(object):
                 c_action.append('chi')
         return c_action, p
 
-    def penggame(self, pid, j, ppre):
-        if j == 'guo' and not isinstance(self.cache_send,dict):
-            self._nextoutcard(ppre)
-            self.cache_send=None
-        elif j=='guo' and isinstance(self.cache_send,dict):
-            for i in self.cache_send.values():
-                i[-1].conn.sendMessage(json.dumps(
-                    {"command": "gpch", "c_action": i[:-1], "indexcard": j, "chicard": self.chicard, "pre_p": i[-1].onlyone}))   
-            self.cache_send=None
-            self.chicard=None                                 
-        else:
-            p = self.players.get(pid)
-            p.handcard[j] = p.handcard[j] + 1
-            p.pcg_list['peng'].append([j] * 3)
-            self.broadcast(
-                {"command": "other_peng", "pinfo": p.pinfo(), "indexcard": j}, passpid=[p.pid])
-            self.cache_send=None
-            self.chicard=None                  
-
     def hugame(self, pid,j):
         p = self.players.get(pid)
         self.broadcast(
-            {"command": "other_hu", "pinfo": p.pinfo(), "indexcard": j}, passpid=[p.pid])        
+            {"command": "other_hu", "pinfo": p.pinfo(), "indexcard": j}, passpid=[p.pid])  
 
+    def penggame(self, pid, j, ppre):
+        p = self.players.get(pid)
+        p.handcard[j] = p.handcard[j] + 1
+        p.pcg_list['peng'].append([j] * 3)
+        self.broadcast(
+            {"command": "other_peng", "pinfo": p.pinfo(), "indexcard": j}, passpid=[p.pid])
+        self.cache_send=None
+        self.chicard=None                  
+ 
 
-    def ganggame(self, pid, j, ppre):
-        if j == 'guo' and not isinstance(self.cache_send,dict):
+    def guogame(self, pid,ppre):
+        if not isinstance(self.cache_send,dict):
             self._nextoutcard(ppre)
-            self.cache_send=None
-        elif j=='guo' and isinstance(self.cache_send,dict):
+        else:
             for i in self.cache_send.values():
                 i[-1].conn.sendMessage(json.dumps(
                     {"command": "gpch", "c_action": i[:-1], "indexcard": j, "chicard": self.chicard, "pre_p": i[-1].onlyone}))   
-            self.cache_send=None
-            self.chicard=None   
-        else:
-            p = self.players.get(pid)
-            p.handcard[j] = p.handcard[j] + 1
-            p.pcg_list['gang'].append([j] * 4)
-            self.broadcast(
-                {"command": "other_gang", "pinfo": p.pinfo(), "indexcard": j}, passpid=[p.pid])
-            self.cache_send=None
-            self.chicard=None                  
+        self.cache_send=None
+        self.chicard=None                   
+
+
+    def ganggame(self, pid, j, ppre):
+        p = self.players.get(pid)
+        p.handcard[j] = p.handcard[j] + 1
+        p.pcg_list['gang'].append([j] * 4)
+        self.broadcast(
+            {"command": "other_gang", "pinfo": p.pinfo(), "indexcard": j}, passpid=[p.pid])
+        self.cache_send=None
+        self.chicard=None                  
 
     def chigame(self, pid, j, jlist):
         p = self.players.get(pid)
-        if j == 'guo':
-            self._nextoutcard(p.onlyone - 1)
-            self.cache_send=None
-            self.chicard=None  
-        else:
-            p.handcard[j] = p.handcard[j] + 1
-            p.pcg_list['chi'].append(jlist)
-            self.broadcast(
-                {"command": "other_chi", "pinfo": p.pinfo(), "indexcard": j}, passpid=[p.pid])
-            self.cache_send=None
-            self.chicard=None                  
+        p.handcard[j] = p.handcard[j] + 1
+        p.pcg_list['chi'].append(jlist)
+        self.broadcast(
+            {"command": "other_chi", "pinfo": p.pinfo(), "indexcard": j}, passpid=[p.pid])
+        self.cache_send=None
+        self.chicard=None                  
 
     def _nextoutcard(self, pre):
         c = pre % self.maxplayer + 1
