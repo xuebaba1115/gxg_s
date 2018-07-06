@@ -242,7 +242,9 @@ class mjroom(object):
                 elif commlist and isinstance(self.cache_send,dict):
                     print 'other_peng,next_chi'
                     self.cache_send[i]=commlist
-           
+                    return
+
+            self.cache_send=None
 
             # except Exception as e:
             #     print "##commaddiect##^^", e
