@@ -1,5 +1,5 @@
 
-import sys
+import sys,os
 import json
 import time
 import random
@@ -19,7 +19,7 @@ class EchoClientProtocol(WebSocketClientProtocol):
     root=False
     def onOpen(self):
         self.sendMessage(json.dumps(
-            {"command": options.creat, "roomid": 88888888, "pid": options.pid}))
+            {"command": options.creat, "roomid": options.room, "pid": options.pid}))
         pass
 
     def onMessage(self, payload, isBinary):
@@ -40,7 +40,7 @@ class EchoClientProtocol(WebSocketClientProtocol):
                     self.onlyone = i['onlyone']
             print 'pid:', options.pid, 'onlyone:', self.onlyone
             self.sendMessage(json.dumps(
-                {"command": "ready", "roomid": 88888888, "readystat": 1, "pid": options.pid}))
+                {"command": "ready", "roomid": options.room, "readystat": 1, "pid": options.pid}))
 
         if x['command'] == 'gaming':
             for i in x['pinfo']:
@@ -52,14 +52,14 @@ class EchoClientProtocol(WebSocketClientProtocol):
         if x['command'] == 'getcard':
             time.sleep(timespeed)
             print '##get_card,outcard', x['getcard']
-            self.sendMessage(json.dumps({"command": "outcard", "roomid": 88888888,
+            self.sendMessage(json.dumps({"command": "outcard", "roomid": options.room,
                                          "pid": options.pid, "outcard": x['getcard'], "pre_p": self.onlyone}))
 
         if x['command'] == 'gpch':
             for i in x['c_action']:
                 print '##get_gpch', i, x['indexcard']
                 if i == 'hu':
-                    self.sendMessage(json.dumps({"command":"hu", "roomid": 88888888,"hucard":x['indexcard'],"pid":options.pid}))
+                    self.sendMessage(json.dumps({"command":"hu", "roomid": options.room,"hucard":x['indexcard'],"pid":options.pid}))
                     print 'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh'
                     reactor.callLater(1,reactor.stop)
 
@@ -69,10 +69,10 @@ class EchoClientProtocol(WebSocketClientProtocol):
                                    ] = self.handcards[x['indexcard']] - 3
                     sjcard = self.suijicard()
                     self.sendMessage(json.dumps(
-                        {"command": "gang", "roomid": 88888888, "pid": options.pid, "gangcard": x['indexcard'], "pre_p": x['ppre']}))
+                        {"command": "gang", "roomid": options.room, "pid": options.pid, "gangcard": x['indexcard'], "pre_p": x['ppre']}))
                     time.sleep(timespeed)
                     self.sendMessage(json.dumps(
-                        {"command": "outcard", "roomid": 88888888, "pid": options.pid, "outcard": sjcard, "pre_p": self.onlyone}))
+                        {"command": "outcard", "roomid": options.room, "pid": options.pid, "outcard": sjcard, "pre_p": self.onlyone}))
                     print 'minggang', sjcard
 
                 if i == 'peng':
@@ -81,10 +81,10 @@ class EchoClientProtocol(WebSocketClientProtocol):
                     sjcard = self.suijicard()
                     time.sleep(timespeed)
                     self.sendMessage(json.dumps(
-                        {"command": "peng", "roomid": 88888888, "pid": options.pid, "pengcard": x['indexcard'], "pre_p": x['ppre']}))
+                        {"command": "peng", "roomid": options.room, "pid": options.pid, "pengcard": x['indexcard'], "pre_p": x['ppre']}))
                     time.sleep(timespeed)
                     self.sendMessage(json.dumps(
-                        {"command": "outcard", "roomid": 88888888, "pid": options.pid, "outcard": sjcard, "pre_p": self.onlyone}))
+                        {"command": "outcard", "roomid": options.room, "pid": options.pid, "outcard": sjcard, "pre_p": self.onlyone}))
                     print '##peng out', sjcard
                     break
 
@@ -96,16 +96,16 @@ class EchoClientProtocol(WebSocketClientProtocol):
                         sjcard = self.suijicard()
                         time.sleep(timespeed)
                         self.sendMessage(json.dumps(
-                            {"command": "chi", "roomid": 88888888, "pid": options.pid, "chicard": x['indexcard'], "chilist": clist}))
+                            {"command": "chi", "roomid": options.room, "pid": options.pid, "chicard": x['indexcard'], "chilist": clist}))
                         time.sleep(timespeed)
                         self.sendMessage(json.dumps(
-                            {"command": "outcard", "roomid": 88888888, "pid": options.pid, "outcard": sjcard, "pre_p": self.onlyone}))
+                            {"command": "outcard", "roomid": options.room, "pid": options.pid, "outcard": sjcard, "pre_p": self.onlyone}))
                         print '##chi out', sjcard
                         break
 
         if x['command'] == 'other_hu':
             if self.root:
-                self.sendMessage(json.dumps({"command":"overroom","roomid":88888888,"pid":options.pid}))  
+                self.sendMessage(json.dumps({"command":"overroom","roomid":options.room,"pid":options.pid}))  
                 reactor.callLater(1,reactor.stop)
             else:
                 reactor.callLater(1,reactor.stop)
@@ -115,7 +115,7 @@ class EchoClientProtocol(WebSocketClientProtocol):
             time.sleep(timespeed+2)
             self.handcards = None
             self.sendMessage(json.dumps(
-                {"command": "ready", "roomid": 88888888, "readystat": 1, "pid": options.pid}))            
+                {"command": "ready", "roomid": options.room, "readystat": 1, "pid": options.pid}))            
                
                                                                                   
 
@@ -135,10 +135,11 @@ if __name__ == '__main__':
     timespeed = 0.5
     parser = OptionParser()
     parser.add_option("-u", "--url", dest="url",
-                      help="The WebSocket URL", default="wss://192.168.1.16:9000")
+                      help="The WebSocket URL", default="wss://118.25.46.180:9000") #wss://118.25.46.18:9000
     parser.add_option("-c", "--creat", dest="creat",
                       help="init_room,join_room", default="init_room")
     parser.add_option("-p", "--pid", dest="pid", help="pid", default=1)
+    parser.add_option("-r", "--room", dest="room", help="roomid", default=88888888)
 
     (options, args) = parser.parse_args()
 
@@ -155,4 +156,8 @@ if __name__ == '__main__':
         contextFactory = None
 
     connectWS(factory, contextFactory)
+   
+    with open("./pid",'a') as file:
+        pid=os.getpid()        
+        file.writelines(str(pid)+'\n')
     reactor.run()
