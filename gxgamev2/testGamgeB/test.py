@@ -135,7 +135,7 @@ if __name__ == '__main__':
     timespeed = 0.5
     parser = OptionParser()
     parser.add_option("-u", "--url", dest="url",
-                      help="The WebSocket URL", default="wss://118.25.46.180:9000") #wss://118.25.46.18:9000
+                      help="The WebSocket URL", default="wss://127.0.0.1:9000") #wss://118.25.46.18:9000
     parser.add_option("-c", "--creat", dest="creat",
                       help="init_room,join_room", default="init_room")
     parser.add_option("-p", "--pid", dest="pid", help="pid", default=1)
