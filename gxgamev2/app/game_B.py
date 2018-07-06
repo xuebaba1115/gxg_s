@@ -95,7 +95,7 @@ class Gamemanger_B(object):
     def guo(self, kw):
         print "guo",kw
         room = self.rooms[kw['data']['roomid']]      
-        room.guogame(kw['data']['pid'], kw['data']['pre_p'])          
+        room.guogame(kw['data']['pid'], kw['data']['ppre'])          
 
     def switch(self, **kw):
         return {
@@ -121,7 +121,7 @@ class mjroom(object):
         self.cards = None
         self.banker = roomroot
         self.guicard = None
-        self.maxplayer = 4
+        self.maxplayer = 2
         self.roomonly = range(1, self.maxplayer + 1)
         self.chicard = None
         self.cache_send = None
@@ -289,12 +289,16 @@ class mjroom(object):
  
 
     def guogame(self, pid,ppre):
+        print "guo",self.cache_send
         if not isinstance(self.cache_send,dict):
+            print "not cache"
             self._nextoutcard(ppre)
         else:
+            print "have cache"
             for i in self.cache_send.values():
+                print i
                 i[-1].conn.sendMessage(json.dumps(
-                    {"command": "gpch", "c_action": i[:-1], "indexcard": j, "chicard": self.chicard, "pre_p": i[-1].onlyone}))   
+                    {"command": "gpch", "c_action": i[:-1], "indexcard": j, "chicard": self.chicard, "ppre": i[-1].onlyone}))   
         self.cache_send=None
         self.chicard=None                   
 
