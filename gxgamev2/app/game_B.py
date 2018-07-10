@@ -55,7 +55,7 @@ class Gamemanger_B(object):
                 us.roomid = None
                 db.session.commit()
                 for p in room.players.values():
-                    p.conn.dropConnection(abort=True)                                    
+                    p.conn.dropConnection(abort=True)
                 del self.rooms[kw['data']['roomid']]
 
     def ready(self, kw):
@@ -69,33 +69,22 @@ class Gamemanger_B(object):
         room.outcardgame(kw['data']['pid'], kw['data']
                          ['outcard'], kw['data']['pre_p'])
 
-    def peng(self, kw):
-        print "peng", kw
-        room = self.rooms[kw['data']['roomid']]
-        room.penggame(kw['data']['pid'], kw['data']
-                      ['pengcard'], kw['data']['pre_p'])
 
-    def gang(self, kw):
-        print "gang", kw
-        room = self.rooms[kw['data']['roomid']]
-        room.ganggame(kw['data']['pid'], kw['data']
-                      ['gangcard'], kw['data']['pre_p'])
-
-    def chi(self, kw):
-        print "chi", kw
-        room = self.rooms[kw['data']['roomid']]
-        room.chigame(kw['data']['pid'], kw['data']
-                     ['chicard'], kw['data']['chilist'])
 
     def hu(self, kw):
         print "hu", kw
         room = self.rooms[kw['data']['roomid']]
-        room.hugame(kw['data']['pid'],kw['data']['hucard'])
+        room.hugame(kw['data']['pid'], kw['data']['hucard'])
 
     def guo(self, kw):
-        print "guo",kw
-        room = self.rooms[kw['data']['roomid']]      
-        room.guogame(kw['data']['pid'], kw['data']['ppre'])          
+        print "guo", kw
+        room = self.rooms[kw['data']['roomid']]
+        room.guogame(kw['data']['pid'], kw['data']['ppre'])
+
+    def gpch(self, kw):
+        print "gpch", kw
+        room = self.rooms[kw['data']['roomid']]
+        room.gpchgame(kw['data']['pid'], kw['data']['indexcard'],kw['data']['c_action'] )        
 
     def switch(self, **kw):
         return {
@@ -104,11 +93,9 @@ class Gamemanger_B(object):
             'ready': self.ready,
             'outcard': self.outcard,
             'overroom': self.overroom,
-            'peng': self.peng,
-            'gang': self.gang,
-            'chi': self.chi,
-            'hu':self.hu,
-            'guo':self.guo
+            'hu': self.hu,
+            'guo': self.guo,
+            'gpch': self.gpch
         }[kw["data"]["command"]](kw)
 
 
@@ -121,7 +108,7 @@ class mjroom(object):
         self.cards = None
         self.banker = roomroot
         self.guicard = None
-        self.maxplayer = 2
+        self.maxplayer = 4
         self.roomonly = range(1, self.maxplayer + 1)
         self.chicard = None
         self.cache_send = None
@@ -174,11 +161,10 @@ class mjroom(object):
                     j = self.cards.pop(random.randint(0, len(self.cards) - 1))
                     p.handcard[j] = p.handcard[j] + 1
                 except IndexError as e:
-                    print '########s', e
+                    print 'error_fapai', e
             p.conn.sendMessage(json.dumps(
-                {"command": "gaming", "pinfo": p.pinfo(["conn"]), "guicard": self.guicard}))     
+                {"command": "gaming", "pinfo": p.pinfo(["conn"]), "guicard": self.guicard}))
             if int(self.banker) == int(p.pid):
-                print '############################'
                 self.getcard(p)
 
     def getcard(self, p):
@@ -187,12 +173,16 @@ class mjroom(object):
             p.conn.sendMessage(json.dumps(
                 {"command": "getcard", "pinfo": p.pinfo(), "getcard": j}))
             jieguo, _ = self.result_computer(p, j, p.onlyone)
-            print '##Ganemgetstat##', jieguo
+            if jieguo:
+                print '##zhimo##', jieguo
+                if "angang" in jieguo or "+gang" in jieguo or "hu" in jieguo:
+                    p.conn.sendMessage(json.dumps(
+                        {"command": "gpch", "c_action": jieguo, "indexcard": j, "ppre": p.onlyone}))
+                    return
             p.handcard[j] = p.handcard[j] + 1
-            if app.split.get_hu_info(p.handcard, 34, self.guicard):
-                print 'send zimohule'
+            print '##Ganemgetstat##', jieguo
         except IndexError as e:
-            print '########g', e
+            print 'error_getcard', e
 
     def outcardgame(self, pid, j, pre_p):
         commdict = {}
@@ -212,39 +202,42 @@ class mjroom(object):
         else:
             print '##look', commdict, self.chicard
             # try:
-            sortonly=[1,2,3,4]
-            sortonly.append(sortonly.pop(pre_p-1))
+            sortonly = [1, 2, 3, 4]
+            sortonly.append(sortonly.pop(pre_p - 1))
             for i in sortonly:
                 commlist = commdict.get(i)
-                if commlist and not isinstance(self.cache_send,dict) :    
+                if commlist and not isinstance(self.cache_send, dict):
                     if 'hu' in commlist:
-                            print 'sendchi'
-                            commlist[-1].conn.sendMessage(json.dumps({"command": "gpch", "c_action": commlist[:-1], "indexcard": j, "chicard": self.chicard, "ppre": pre_p}))
-                            self.chicard = None  
-                            self.cache_send =None 
-                            continue
+                        print 'sendchi'
+                        commlist[-1].conn.sendMessage(json.dumps(
+                            {"command": "gpch", "c_action": commlist[:-1], "indexcard": j, "chicard": self.chicard, "ppre": pre_p}))
+                        self.chicard = None
+                        self.cache_send = None
+                        continue
                     if 'chi' in commlist:
-                            print 'sendchi'
-                            commlist[-1].conn.sendMessage(json.dumps({"command": "gpch", "c_action": commlist[:-1], "indexcard": j, "chicard": self.chicard, "ppre": pre_p}))
-                            self.chicard = None  
-                            self.cache_send =None 
-                            continue
-                    if 'minggang_peng' in commlist: 
-                        print 'sendgang' 
+                        print 'sendchi'
+                        commlist[-1].conn.sendMessage(json.dumps(
+                            {"command": "gpch", "c_action": commlist[:-1], "indexcard": j, "chicard": self.chicard, "ppre": pre_p}))
+                        self.chicard = None
+                        self.cache_send = None
+                        continue
+                    if 'minggang_peng' in commlist:
+                        print 'sendgang'
                         commlist[-1].conn.sendMessage(json.dumps(
                             {"command": "gpch", "c_action": commlist[:-1], "indexcard": j, "ppre": pre_p}))
-                        self.cache_send={}                             
-                    if 'peng' in commlist: 
-                        print 'sendpeng' 
+                        self.cache_send = {}
+                    if 'peng' in commlist:
+                        print 'sendpeng'
                         commlist[-1].conn.sendMessage(json.dumps(
                             {"command": "gpch", "c_action": commlist[:-1], "indexcard": j, "ppre": pre_p}))
-                        self.cache_send={}                                                                                                                           
-                elif commlist and isinstance(self.cache_send,dict):
+                        self.cache_send = {}
+                elif commlist and isinstance(self.cache_send, dict):
                     print 'other_peng,next_chi'
-                    self.cache_send[i]=commlist
+                    commlist.append(j)
+                    self.cache_send[i] = commlist
                     return
 
-            self.cache_send=None
+            self.cache_send = None
 
             # except Exception as e:
             #     print "##commaddiect##^^", e
@@ -257,8 +250,10 @@ class mjroom(object):
         tmpcards[j] = tmpcards[j] + 1
         print 'tmp   card', p.onlyone, tmpcards
         result_hu = app.split.get_hu_info(tmpcards, 34, self.guicard)
-        result_peng = app.split.get_peng(j, p.handcard, p.pcg_list,self.guicard)
-        result_gang = app.split.get_gang(j, p.handcard, p.pcg_list,self.guicard)
+        result_peng = app.split.get_peng(
+            j, p.handcard, p.pcg_list, self.guicard)
+        result_gang = app.split.get_gang(
+            j, p.handcard, p.pcg_list, self.guicard)
         if result_hu:
             c_action.append('hu')
         if result_peng and c != p.onlyone:
@@ -270,58 +265,50 @@ class mjroom(object):
         elif result_gang == 'angang_peng':
             c_action.append('minggang_peng')
         if c + 1 == p.onlyone:
-            self.chicard = app.split.chi(j, p.handcard, p.pcg_list,self.guicard)
+            self.chicard = app.split.chi(
+                j, p.handcard, p.pcg_list, self.guicard)
             if self.chicard:
                 c_action.append('chi')
         return c_action, p
 
-    def hugame(self, pid,j):
+    def hugame(self, pid, j):
         p = self.players.get(pid)
         self.broadcast(
-            {"command": "other_hu", "pinfo": p.pinfo(), "indexcard": j}, passpid=[p.pid])  
+            {"command": "other_hu", "pinfo": p.pinfo(), "indexcard": j}, passpid=[p.pid])
 
-    def penggame(self, pid, j, ppre):
-        p = self.players.get(pid)
-        p.handcard[j] = p.handcard[j] + 1
-        p.pcg_list['peng'].append([j] * 3)
-        self.broadcast(
-            {"command": "other_peng", "pinfo": p.pinfo(), "indexcard": j}, passpid=[p.pid])
-        self.cache_send=None
-        self.chicard=None                  
- 
 
-    def guogame(self, pid,ppre):
-        print "guo",self.cache_send
-        if not isinstance(self.cache_send,dict):
+    def guogame(self, pid, ppre):
+        print "guo", self.cache_send
+        if not isinstance(self.cache_send, dict):
             print "not cache"
             self._nextoutcard(ppre)
         else:
             print "have cache"
             for i in self.cache_send.values():
                 print i
-                i[-1].conn.sendMessage(json.dumps(
-                    {"command": "gpch", "c_action": i[:-1], "indexcard": j, "chicard": self.chicard, "ppre": i[-1].onlyone}))   
-        self.cache_send=None
-        self.chicard=None                   
+                i[-2].conn.sendMessage(json.dumps(
+                    {"command": "gpch", "c_action": i[:-2], "indexcard": i[-1], "chicard": self.chicard, "ppre": i[-2].onlyone}))
+        self.cache_send = None
+        self.chicard = None
 
 
-    def ganggame(self, pid, j, ppre):
-        p = self.players.get(pid)
-        p.handcard[j] = p.handcard[j] + 1
-        p.pcg_list['gang'].append([j] * 4)
+
+    def gpchgame(self,pid,j,action):
+        p = self.players.get(pid)                     
+        if   isinstance(j,int) :
+            p.handcard[j] = p.handcard[j] + 1 
+        else:
+             p.handcard[j[0]]=  p.handcard[j[0]]+1
+        if action=='+gang' or action =='minggang' or action=='angang':
+            p.pcg_list['gang'].append([j] * 4)
+        if action=='peng':
+            p.pcg_list['peng'].append([j] * 3)
+        if action=='chi':
+            p.pcg_list['chi'].append(j)
+        self.cache_send = None
+        self.chicard = None
         self.broadcast(
-            {"command": "other_gang", "pinfo": p.pinfo(), "indexcard": j}, passpid=[p.pid])
-        self.cache_send=None
-        self.chicard=None                  
-
-    def chigame(self, pid, j, jlist):
-        p = self.players.get(pid)
-        p.handcard[j] = p.handcard[j] + 1
-        p.pcg_list['chi'].append(jlist)
-        self.broadcast(
-            {"command": "other_chi", "pinfo": p.pinfo(), "indexcard": j}, passpid=[p.pid])
-        self.cache_send=None
-        self.chicard=None                  
+            {"command": "other_chi", "pinfo": p.pinfo(), "indexcard": j}, passpid=[p.pid])        
 
     def _nextoutcard(self, pre):
         c = pre % self.maxplayer + 1
@@ -330,33 +317,34 @@ class mjroom(object):
                 try:
                     i = self.cards.pop(random.randint(0, len(self.cards) - 1))
                     p.conn.sendMessage(json.dumps(
-                        {"command": "getcard", "pinfo": p.pinfo(), "getcard": i}))                    
+                        {"command": "getcard", "pinfo": p.pinfo(), "getcard": i}))
                     print 'nextcardend', p.handcard
-                    # jieguo, _ = self.result_computer(p, i, p.onlyone)
-                    # if 'angang' in jieguo or '+gang' in jieguo:
-                    #     p.conn.sendMessage(json.dumps({"command": "selfgang", "c_action": jieguo, "indexcard": i}))
-                    p.handcard[i] = p.handcard[i] + 1                            
-                    if app.split.get_hu_info(p.handcard, 34, self.guicard):
-                        print 'send zimohule'
+                    jieguo, _ = self.result_computer(p, i, p.onlyone)
+                    if jieguo:
+                        if "angang" in jieguo or "+gang" in jieguo or "hu" in jieguo:
+                            print '##zhimo##', jieguo
+                            p.conn.sendMessage(json.dumps(
+                                {"command": "gpch", "c_action": jieguo, "indexcard": i, "ppre": p.onlyone}))
+                            return
+                    p.handcard[i] = p.handcard[i] + 1
+                    print 'nextcardend', p.handcard
                 except IndexError as e:
-                    print '########o', e
+                    print 'error_getcard', e
                 except ValueError as e:
-                    print 'no card get', e 
-                    self.restart_game()    
-                    self.broadcast({'command':'nocard'})              
+                    print 'error_liuju', e
+                    self.restart_game()
+                    self.broadcast({'command': 'nocard'})
                 break
 
     def restart_game(self):
-        self.banker=self.banker%self.maxplayer+1
-        self.cache_send=None
-        self.chicard=None 
+        self.banker = self.banker % self.maxplayer + 1
+        self.cache_send = None
+        self.chicard = None
         self.cards = None
         for p in self.players.values():
-            p.handcard=[0 for i in xrange(34)]
-            p.readystat=0
+            p.handcard = [0 for i in xrange(34)]
+            p.readystat = 0
             self.pcg_list = {'chi': [], 'peng': [], 'gang': []}
-           
-                        
 
 
 class player(object):

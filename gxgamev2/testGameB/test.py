@@ -46,6 +46,7 @@ class EchoClientProtocol(WebSocketClientProtocol):
             for i in x['pinfo']:
                 if i == 'handcard':
                     self.handcards = x['pinfo'][i]
+            print self.handcards                    
             self.handcards[x['guicard']] = 0
             print '##guicard', x['guicard']
 
@@ -59,7 +60,7 @@ class EchoClientProtocol(WebSocketClientProtocol):
             for i in x['c_action']:
                 print '##get_gpch', i, x['indexcard']
                 if i == 'hu':
-                    self.sendMessage(json.dumps({"command":"hu", "roomid": options.room,"hucard":x['indexcard'],"pid":options.pid}))
+                    self.sendMessage(json.dumps({"command":"hu", "roomid": options.room,"hucard":x['indexcard'],"pid":options.pid}))                    
                     print 'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh'
                     reactor.callLater(1,reactor.stop)
 
@@ -68,8 +69,9 @@ class EchoClientProtocol(WebSocketClientProtocol):
                     self.handcards[x['indexcard']
                                    ] = self.handcards[x['indexcard']] - 3
                     sjcard = self.suijicard()
-                    self.sendMessage(json.dumps(
-                        {"command": "gang", "roomid": options.room, "pid": options.pid, "gangcard": x['indexcard'], "pre_p": x['ppre']}))
+                    self.sendMessage(json.dumps({"command": x['command'], "roomid": options.room, "pid": options.pid, 'c_action':i,"indexcard": x['indexcard'], "pre_p": x['ppre']}))
+                    # self.sendMessage(json.dumps(
+                    #     {"command": "gang", "roomid": options.room, "pid": options.pid, "gangcard": x['indexcard'], "pre_p": x['ppre']}))
                     time.sleep(timespeed)
                     self.sendMessage(json.dumps(
                         {"command": "outcard", "roomid": options.room, "pid": options.pid, "outcard": sjcard, "pre_p": self.onlyone}))
@@ -80,14 +82,15 @@ class EchoClientProtocol(WebSocketClientProtocol):
                                    ] = self.handcards[x['indexcard']] - 2
                     sjcard = self.suijicard()
                     time.sleep(timespeed)
-                    self.sendMessage(json.dumps(
-                        {"command": "peng", "roomid": options.room, "pid": options.pid, "pengcard": x['indexcard'], "pre_p": x['ppre']}))
+                    self.sendMessage(json.dumps({"command": x['command'], "roomid": options.room, "pid": options.pid, 'c_action':i,"indexcard": x['indexcard'], "pre_p": x['ppre']}))
+                    # self.sendMessage(json.dumps(
+                    #     {"command": "peng", "roomid": options.room, "pid": options.pid, "pengcard": x['indexcard'], "pre_p": x['ppre']}))
                     time.sleep(timespeed)
                     self.sendMessage(json.dumps(
                         {"command": "outcard", "roomid": options.room, "pid": options.pid, "outcard": sjcard, "pre_p": self.onlyone}))
                     print '##peng out', sjcard
                     break
-
+                #{"command": "gpch", "roomid": options.room, "pid": options.pid, 'c_action':i,"indexcard": x['indexcard'], "pre_p": x['ppre']}
                 if i == 'chi':
                     for clist in x['chicard']:
                         print clist
@@ -95,8 +98,10 @@ class EchoClientProtocol(WebSocketClientProtocol):
                         self.handcards[clist[2]] = self.handcards[clist[2]] - 1
                         sjcard = self.suijicard()
                         time.sleep(timespeed)
-                        self.sendMessage(json.dumps(
-                            {"command": "chi", "roomid": options.room, "pid": options.pid, "chicard": x['indexcard'], "chilist": clist}))
+                        self.sendMessage(json.dumps({"command": x['command'], "roomid": options.room, "pid": options.pid, 'c_action':i,"indexcard": clist, "pre_p": x['ppre']}))
+                        # self.sendMessage(json.dumps(
+                        #     {"command": "chi", "roomid": options.room, "pid": options.pid, "chicard": x['indexcard'], "chilist": clist}))
+                        # time.sleep(timespeed)
                         time.sleep(timespeed)
                         self.sendMessage(json.dumps(
                             {"command": "outcard", "roomid": options.room, "pid": options.pid, "outcard": sjcard, "pre_p": self.onlyone}))
@@ -112,7 +117,7 @@ class EchoClientProtocol(WebSocketClientProtocol):
 
         if x['command'] == 'nocard' :       
             print 'nocard######################'
-            time.sleep(timespeed+2)
+            time.sleep(timespeed+4)
             self.handcards = None
             self.sendMessage(json.dumps(
                 {"command": "ready", "roomid": options.room, "readystat": 1, "pid": options.pid}))            
@@ -132,7 +137,7 @@ class EchoClientProtocol(WebSocketClientProtocol):
 if __name__ == '__main__':
 
     log.startLogging(sys.stdout)
-    timespeed = 0.5
+    timespeed = 0.2
     parser = OptionParser()
     parser.add_option("-u", "--url", dest="url",
                       help="The WebSocket URL", default="wss://127.0.0.1:9000") #wss://118.25.46.18:9000
