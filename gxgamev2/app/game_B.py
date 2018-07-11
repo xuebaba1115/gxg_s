@@ -23,7 +23,7 @@ class Gamemanger_B(object):
         print roomid
         if not roomid in self.rooms:
             return 1, 'roomid wuxiao'
-        elif len(self.rooms[roomid].players) == 4:
+        elif len(self.rooms[roomid].players) == self.rooms[roomid].maxplayer:
             return 1, 'player full'
         else:
             return 0, roomid
@@ -69,8 +69,6 @@ class Gamemanger_B(object):
         room.outcardgame(kw['data']['pid'], kw['data']
                          ['outcard'], kw['data']['pre_p'])
 
-
-
     def hu(self, kw):
         print "hu", kw
         room = self.rooms[kw['data']['roomid']]
@@ -108,7 +106,7 @@ class mjroom(object):
         self.cards = None
         self.banker = roomroot
         self.guicard = None
-        self.maxplayer = 4
+        self.maxplayer = 2
         self.roomonly = range(1, self.maxplayer + 1)
         self.chicard = None
         self.cache_send = None
@@ -116,7 +114,7 @@ class mjroom(object):
     def initplayer(self, data, conn):
         print data, "initplayer"
         if len(self.players) == self.maxplayer:
-            raise Exception("player ge 4")
+            raise Exception(1)
         if data['pid'] in self.players:  # 断线
             oldp = self.players.get(data['pid'])
             oldp.conn.dropConnection(abort=True)
@@ -162,6 +160,7 @@ class mjroom(object):
                     p.handcard[j] = p.handcard[j] + 1
                 except IndexError as e:
                     print 'error_fapai', e
+                    raise Exception(3)
             p.conn.sendMessage(json.dumps(
                 {"command": "gaming", "pinfo": p.pinfo(["conn"]), "guicard": self.guicard}))
             if int(self.banker) == int(p.pid):
@@ -183,6 +182,7 @@ class mjroom(object):
             print '##Ganemgetstat##', jieguo
         except IndexError as e:
             print 'error_getcard', e
+            raise Exception(2)
 
     def outcardgame(self, pid, j, pre_p):
         commdict = {}
@@ -200,12 +200,11 @@ class mjroom(object):
         if not commdict:
             self._nextoutcard(pre_p)
         else:
-            print '##look', commdict, self.chicard
-            # try:
             sortonly = [1, 2, 3, 4]
             sortonly.append(sortonly.pop(pre_p - 1))
             for i in sortonly:
                 commlist = commdict.get(i)
+                print '##look', commdict,commlist, self.chicard
                 if commlist and not isinstance(self.cache_send, dict):
                     if 'hu' in commlist:
                         print 'sendchi'
@@ -291,8 +290,6 @@ class mjroom(object):
         self.cache_send = None
         self.chicard = None
 
-
-
     def gpchgame(self,pid,j,action):
         p = self.players.get(pid)                     
         if   isinstance(j,int) :
@@ -301,6 +298,7 @@ class mjroom(object):
              p.handcard[j[0]]=  p.handcard[j[0]]+1
         if action=='+gang' or action =='minggang' or action=='angang':
             p.pcg_list['gang'].append([j] * 4)
+            self._nextoutcard(p.onlyeone-1)
         if action=='peng':
             p.pcg_list['peng'].append([j] * 3)
         if action=='chi':
@@ -329,7 +327,7 @@ class mjroom(object):
                     p.handcard[i] = p.handcard[i] + 1
                     print 'nextcardend', p.handcard
                 except IndexError as e:
-                    print 'error_getcard', e
+                    raise Exception(2)
                 except ValueError as e:
                     print 'error_liuju', e
                     self.restart_game()

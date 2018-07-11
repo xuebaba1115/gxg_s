@@ -253,8 +253,7 @@ def chi(card,hand_cards,pcg,guiid):
 	if card<27:
 		for i in check_chi(card,v_card):
 			if i:
-				chilist.append(i)
-		print chilist,"app.chi_list"				
+				chilist.append(i)				
 		return chilist
 
 def check_chi(card,hand_cards):

@@ -23,13 +23,12 @@ class EchoClientProtocol(WebSocketClientProtocol):
         pass
 
     def onMessage(self, payload, isBinary):
-        if not isBinary:
+        if not isBinary:            
             try:
                 x = json.loads(payload.decode('utf8'))
-                self.analysis(x)
+                self.analysis(x)                
             except Exception as e:
-                self.sendMessage(json.dumps(
-                    {"errcode": 1, "errmsg": "%s" % e}).encode('utf8'))
+                print e
 
     def analysis(self, x):
         if x['command'] == options.creat and self.onlyone == None:
@@ -57,14 +56,15 @@ class EchoClientProtocol(WebSocketClientProtocol):
                                          "pid": options.pid, "outcard": x['getcard'], "pre_p": self.onlyone}))
 
         if x['command'] == 'gpch':
-            for i in x['c_action']:
-                print '##get_gpch', i, x['indexcard']
+            for i in x['c_action']:                
                 if i == 'hu':
                     self.sendMessage(json.dumps({"command":"hu", "roomid": options.room,"hucard":x['indexcard'],"pid":options.pid}))                    
                     print 'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh'
                     reactor.callLater(1,reactor.stop)
 
                 if i == 'minggang_peng':
+                    time.sleep(timespeed)
+                    print 'action gang'                    
                     time.sleep(timespeed)
                     self.handcards[x['indexcard']
                                    ] = self.handcards[x['indexcard']] - 3
@@ -78,6 +78,8 @@ class EchoClientProtocol(WebSocketClientProtocol):
                     print 'minggang', sjcard
 
                 if i == 'peng':
+                    time.sleep(timespeed)
+                    print 'action peng'
                     self.handcards[x['indexcard']
                                    ] = self.handcards[x['indexcard']] - 2
                     sjcard = self.suijicard()
@@ -92,6 +94,8 @@ class EchoClientProtocol(WebSocketClientProtocol):
                     break
                 #{"command": "gpch", "roomid": options.room, "pid": options.pid, 'c_action':i,"indexcard": x['indexcard'], "pre_p": x['ppre']}
                 if i == 'chi':
+                    time.sleep(timespeed)
+                    print 'action chi'
                     for clist in x['chicard']:
                         print clist
                         self.handcards[clist[1]] = self.handcards[clist[1]] - 1
@@ -137,7 +141,7 @@ class EchoClientProtocol(WebSocketClientProtocol):
 if __name__ == '__main__':
 
     log.startLogging(sys.stdout)
-    timespeed = 0.2
+    timespeed = 0.5
     parser = OptionParser()
     parser.add_option("-u", "--url", dest="url",
                       help="The WebSocket URL", default="wss://127.0.0.1:9000") #wss://118.25.46.18:9000

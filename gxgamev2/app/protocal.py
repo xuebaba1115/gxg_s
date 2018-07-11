@@ -1,5 +1,6 @@
 # coding:utf8
 import json
+from app import errors
 from app.utiles import verify_auth_token
 from manager import ConnectionManager
 from game_A import Gamemanger
@@ -55,9 +56,9 @@ class GxgServerProtocol(WebSocketServerProtocol):
             try:
                 x = json.loads(payload.decode('utf8'))
                 res = yield self.slowsquare(x)
-            except Exception as e:
+            except Exception as e:               
                 self.sendMessage(json.dumps(
-                    {"errcode": 1, "errmsg": "%s" % e}).encode('utf8'))
+                        {"errcode": e.message, "errmsg": errors.getError(e.message)}))
 
     @inlineCallbacks
     def slowsquare(self, x):
@@ -70,9 +71,7 @@ class GxgServerProtocol(WebSocketServerProtocol):
             self.factory.broadcast(json.dumps(
                 allplayers).encode('utf8'), pl)            
         elif "pid"in x:
-            self.factory.gamemanger_B.switch(data=x, conn=self)
-            pass
-
+            self.factory.gamemanger_B.switch(data=x, conn=self)            
         else:
             aa = yield self.factory.gamemanger_A.handledata(x)
             if aa == None:

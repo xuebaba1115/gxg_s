@@ -1,9 +1,9 @@
 #!/bin/bash
 
-  for i in {1..50};
-  do
-    python ./test.py -r $i -p $i  > /dev/null &
-  done
+  # for i in {1..50};
+  # do
+  #   python ./test.py -r $i -p $i  > /dev/null &
+  # done
 
 
   for i in {1..50};
@@ -12,4 +12,4 @@
   done  
 
 
-  #kill -9 `cat ./pid`
+  #kill -9 `cat ./pid` &&  echo "" > pid 
