@@ -155,7 +155,7 @@ def creatroom():
 
     us = WXUser.query.filter_by(id=sqlid['id']).first()
     if us.roomid != None:
-        return jsonify(roomid=us.roomid)
+        return jsonify(roomid=us.roomid,error=0)
 
     for i in range(3):
         roomid = Gamemanger_B.getroomid()
