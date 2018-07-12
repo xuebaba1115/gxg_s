@@ -35,7 +35,7 @@ class Gamemanger_B(object):
             raise Exception("System roomid conflict")
         self.rooms[kw['data']['roomid']] = _room
         _room.initplayer(kw['data'], kw['conn'])
-        pass
+        
 
     def join_room(self, kw):
         print kw, "joinroom"
@@ -57,6 +57,10 @@ class Gamemanger_B(object):
                 for p in room.players.values():
                     p.conn.dropConnection(abort=True)
                 del self.rooms[kw['data']['roomid']]
+            else:
+                del room.players[kw['data']['pid']]       
+                for p in room.players.values():
+                    p.conn.sendMessage(json.dumps({"command":'overroom'}))         
 
     def ready(self, kw):
         print "ready", kw
@@ -111,15 +115,21 @@ class mjroom(object):
         self.chicard = None
         self.cache_send = None
 
-    def initplayer(self, data, conn):
+    def initplayer(self, data, conn,isstart=False):
         print data, "initplayer"
-        if len(self.players) == self.maxplayer:
-            raise Exception(1)
         if data['pid'] in self.players:  # 断线
             oldp = self.players.get(data['pid'])
             oldp.conn.dropConnection(abort=True)
             oldp.conn = conn
+            if not isstart:                
+                conn.sendMessage(json.dumps({"command": data['command'], "pinfo": [
+                                   p.pinfo() for p in self.players.values()]}))            
+            else:
+                conn.sendMessage(json.dumps({"command": data['command'], "pinfo": [
+                                   p.pinfo(["conn"]) for p in self.players.values()]}))                                      
         else:
+            if len(self.players) == self.maxplayer:
+                raise Exception(1)            
             _play = player(data['pid'], conn, onlyone=self.roomonly.pop(
                 random.randint(0, len(self.roomonly) - 1)))
             self.players[_play.pid] = _play
@@ -162,7 +172,7 @@ class mjroom(object):
                     print 'error_fapai', e
                     raise Exception(3)
             p.conn.sendMessage(json.dumps(
-                {"command": "gaming", "pinfo": p.pinfo(["conn"]), "guicard": self.guicard}))
+                {"command": "gaming", "pinfo": p.pinfo(["conn"]), "guicard": self.guicard})) 
             if int(self.banker) == int(p.pid):
                 self.getcard(p)
 
@@ -208,27 +218,27 @@ class mjroom(object):
                 if commlist and not isinstance(self.cache_send, dict):
                     if 'hu' in commlist:
                         print 'sendchi'
-                        commlist[-1].conn.sendMessage(json.dumps(
-                            {"command": "gpch", "c_action": commlist[:-1], "indexcard": j, "chicard": self.chicard, "ppre": pre_p}))
+                        commlist[-1].sendGameData(
+                            {"command": "gpch", "c_action": commlist[:-1], "indexcard": j, "chicard": self.chicard, "ppre": pre_p})#sendgame
                         self.chicard = None
                         self.cache_send = None
                         continue
                     if 'chi' in commlist:
                         print 'sendchi'
-                        commlist[-1].conn.sendMessage(json.dumps(
-                            {"command": "gpch", "c_action": commlist[:-1], "indexcard": j, "chicard": self.chicard, "ppre": pre_p}))
+                        commlist[-1].sendGameData(
+                            {"command": "gpch", "c_action": commlist[:-1], "indexcard": j, "chicard": self.chicard, "ppre": pre_p})#sendgame
                         self.chicard = None
                         self.cache_send = None
                         continue
                     if 'minggang_peng' in commlist:
                         print 'sendgang'
-                        commlist[-1].conn.sendMessage(json.dumps(
-                            {"command": "gpch", "c_action": commlist[:-1], "indexcard": j, "ppre": pre_p}))
+                        commlist[-1].sendGameData(
+                            {"command": "gpch", "c_action": commlist[:-1], "indexcard": j, "ppre": pre_p})#sendgame
                         self.cache_send = {}
                     if 'peng' in commlist:
                         print 'sendpeng'
-                        commlist[-1].conn.sendMessage(json.dumps(
-                            {"command": "gpch", "c_action": commlist[:-1], "indexcard": j, "ppre": pre_p}))
+                        commlist[-1].sendGameData(
+                            {"command": "gpch", "c_action": commlist[:-1], "indexcard": j, "ppre": pre_p})#sendgame
                         self.cache_send = {}
                 elif commlist and isinstance(self.cache_send, dict):
                     print 'other_peng,next_chi'
@@ -274,10 +284,13 @@ class mjroom(object):
         p = self.players.get(pid)
         self.broadcast(
             {"command": "other_hu", "pinfo": p.pinfo(), "indexcard": j}, passpid=[p.pid])
+        p.cache_data=None            
 
 
     def guogame(self, pid, ppre):
         print "guo", self.cache_send
+        p = self.players.get(pid) 
+        p.cache_data=None
         if not isinstance(self.cache_send, dict):
             print "not cache"
             self._nextoutcard(ppre)
@@ -285,8 +298,8 @@ class mjroom(object):
             print "have cache"
             for i in self.cache_send.values():
                 print i
-                i[-2].conn.sendMessage(json.dumps(
-                    {"command": "gpch", "c_action": i[:-2], "indexcard": i[-1], "chicard": self.chicard, "ppre": i[-2].onlyone}))
+                i[-2].sendGameData(
+                    {"command": "gpch", "c_action": i[:-2], "indexcard": i[-1], "chicard": self.chicard, "ppre": i[-2].onlyone})#sendgame
         self.cache_send = None
         self.chicard = None
 
@@ -303,6 +316,7 @@ class mjroom(object):
             p.pcg_list['peng'].append([j] * 3)
         if action=='chi':
             p.pcg_list['chi'].append(j)
+        p.cache_data=None            
         self.cache_send = None
         self.chicard = None
         self.broadcast(
@@ -354,14 +368,19 @@ class player(object):
         self.handcard = [0 for i in xrange(34)]
         self.onlyone = onlyone
         self.pcg_list = {'chi': [], 'peng': [], 'gang': []}
+        self.cache_data=None
 
     def pinfo(self, items=None):
         info = {}
         if items == None:
-            items = ["conn", "handcard"]
+            items = ["conn", "handcard","pcg_list","cache_data"]
         for key in self.__dict__:
             if key in items:
                 pass
             else:
                 info[key] = self.__dict__[key]
         return info
+
+    def sendGameData(self, msg):
+        self.cache_data=msg
+        self.conn.sendMessage(json.dumps(msg))
