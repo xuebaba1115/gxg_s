@@ -30,7 +30,7 @@ class Gamemanger_B(object):
 
     def init_room(self, kw):
         print kw, "initroom"
-        _room = mjroom(kw['data']['roomid'], kw['data']['pid'])
+        _room = mjroom(kw['data']['roomid'], kw['data']['pid'],kw['data'].get('maxplayer',2))
         if _room.roomid in self.rooms:
             raise Exception("System roomid conflict")
         self.rooms[kw['data']['roomid']] = _room
@@ -103,25 +103,26 @@ class Gamemanger_B(object):
 
 class mjroom(object):
 
-    def __init__(self, roomid, roomroot):
+    def __init__(self, roomid, roomroot,maxplayer=2):
         self.roomroot = roomroot
         self.roomid = roomid
         self.players = {}
         self.cards = None
         self.banker = roomroot
         self.guicard = None
-        self.maxplayer = 2
+        self.maxplayer = maxplayer
         self.roomonly = range(1, self.maxplayer + 1)
         self.chicard = None
         self.cache_send = None
+        self.isstart=False
 
-    def initplayer(self, data, conn,isstart=False):
+    def initplayer(self, data, conn):
         print data, "initplayer"
         if data['pid'] in self.players:  # 断线
             oldp = self.players.get(data['pid'])
             oldp.conn.dropConnection(abort=True)
             oldp.conn = conn
-            if not isstart:                
+            if not self.isstart:                
                 conn.sendMessage(json.dumps({"command": data['command'], "pinfo": [
                                    p.pinfo() for p in self.players.values()]}))            
             else:
@@ -148,7 +149,9 @@ class mjroom(object):
             readyok += p.readystat
         if readyok == self.maxplayer:  # 准备状态
             self.broadcast({"command": "startgame"})
+            self.isstart=True
             self.startgame()
+            
 
     def broadcast(self, msg, passpid=None):
         for p in self.players.values():
@@ -173,6 +176,7 @@ class mjroom(object):
                     raise Exception(3)
             p.conn.sendMessage(json.dumps(
                 {"command": "gaming", "pinfo": p.pinfo(["conn"]), "guicard": self.guicard})) 
+
             if int(self.banker) == int(p.pid):
                 self.getcard(p)
 
@@ -198,9 +202,9 @@ class mjroom(object):
         commdict = {}
         for p in self.players.values():
             if pid == p.pid:
-                print 'nowout_qai', p.handcard
+                print 'nowout_qai  ', p.handcard
                 p.handcard[j] = p.handcard[j] - 1
-                print 'nowout_hou', p.handcard
+                print 'nowout_hou  ', p.handcard
                 continue
             r_action, pp = self.result_computer(p, j, pre_p)
             if r_action:
@@ -284,7 +288,8 @@ class mjroom(object):
         p = self.players.get(pid)
         self.broadcast(
             {"command": "other_hu", "pinfo": p.pinfo(), "indexcard": j}, passpid=[p.pid])
-        p.cache_data=None            
+        p.cache_data=None    
+        self.isstart=False        
 
 
     def guogame(self, pid, ppre):
@@ -330,7 +335,7 @@ class mjroom(object):
                     i = self.cards.pop(random.randint(0, len(self.cards) - 1))
                     p.conn.sendMessage(json.dumps(
                         {"command": "getcard", "pinfo": p.pinfo(), "getcard": i}))
-                    print 'nextcardend', p.handcard
+                    print 'nextcardend ', p.handcard
                     jieguo, _ = self.result_computer(p, i, p.onlyone)
                     if jieguo:
                         if "angang" in jieguo or "+gang" in jieguo or "hu" in jieguo:
@@ -339,7 +344,7 @@ class mjroom(object):
                                 {"command": "gpch", "c_action": jieguo, "indexcard": i, "ppre": p.onlyone}))
                             return
                     p.handcard[i] = p.handcard[i] + 1
-                    print 'nextcardend', p.handcard
+                    print 'nextcardend ', p.handcard
                 except IndexError as e:
                     raise Exception(2)
                 except ValueError as e:
@@ -349,6 +354,7 @@ class mjroom(object):
                 break
 
     def restart_game(self):
+        self.isstart=False
         self.banker = self.banker % self.maxplayer + 1
         self.cache_send = None
         self.chicard = None

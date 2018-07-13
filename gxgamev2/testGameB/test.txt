@@ -26,3 +26,4 @@
 
 
 
+{"command":"gpch","roomid":88888888,"pid":2,"c_action": "chi","indexcard": 15, "ppre": 2}
