@@ -276,7 +276,8 @@ class mjroom(object):
         elif result_gang == 'angang_peng' and c == p.onlyone:
             c_action.append('angang')
         elif result_gang == 'angang_peng':
-            c_action.append('minggang_peng')
+            c_action.append('minggang')
+            c_action.append('peng')
         if c + 1 == p.onlyone:
             self.chicard = app.split.chi(
                 j, p.handcard, p.pcg_list, self.guicard)
