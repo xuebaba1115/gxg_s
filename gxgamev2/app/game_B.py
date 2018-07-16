@@ -22,7 +22,7 @@ class Gamemanger_B(object):
     def getroomstatus(self, roomid):
         print roomid
         if not roomid in self.rooms:
-            return 1, 'roomid wuxiao'
+            return 2, 'roomid wuxiao'
         elif len(self.rooms[roomid].players) == self.rooms[roomid].maxplayer:
             return 1, 'player full'
         else:
