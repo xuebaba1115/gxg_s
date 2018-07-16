@@ -183,7 +183,7 @@ def creatroom():
             break
     us.roomid=roomid   
     db.session.commit()    
-    return jsonify(roomid=roomid)
+    return jsonify(roomstat=roomid)
 
 
 @users.route('/api/downres/<path:filename>', methods=['GET'])
