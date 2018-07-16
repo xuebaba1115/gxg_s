@@ -128,6 +128,25 @@ def new_youke():
     return jsonify(token=token.decode('ascii'), gamestatus=saveus.gamestatus, pid=saveus.id, roomid=saveus.roomid)
 
 
+@users.route('/api/delroomid', methods=['GET'])
+def del_roomid():
+    token=request.args.get('token')
+    if token!=None:
+        sqlid = verify_auth_token(token)
+        if sqlid == None:
+            return jsonify(error=1,errormsg='token err')
+    else:
+        return jsonify(error=1,errormsg='no token')   
+    sqlid = verify_auth_token(token)
+    if sqlid == None:
+        return jsonify(error=1,errormsg='token err')
+
+    us = WXUser.query.filter_by(id=sqlid['id']).first()
+    us.roomid=None   
+    db.session.commit() 
+    return jsonify(error=0,errormsg='del roomid ok')
+
+
 @users.route('/api/creatroom',methods=['GET', 'POST'])
 def creatroom():
     token=request.args.get('token')
@@ -137,7 +156,7 @@ def creatroom():
         if sqlid == None:
             return jsonify(error=1,errormsg='token err')
     else:
-        return jsonify(error=1,errormsg='no token')    
+        return jsonify(error=1,errormsg='no token')     
 
 
     if reqroomid != None:

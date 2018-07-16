@@ -234,11 +234,12 @@ class mjroom(object):
                         self.chicard = None
                         self.cache_send = None
                         continue
-                    if 'minggang_peng' in commlist:
+                    if 'minggang' in commlist or 'angang' in commlist or '+gang' in commlist:
                         print 'sendgang'
                         commlist[-1].sendGameData(
                             {"command": "gpch", "c_action": commlist[:-1], "indexcard": j, "ppre": pre_p})#sendgame
                         self.cache_send = {}
+                        continue
                     if 'peng' in commlist:
                         print 'sendpeng'
                         commlist[-1].sendGameData(
