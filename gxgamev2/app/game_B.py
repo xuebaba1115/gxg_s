@@ -24,7 +24,7 @@ class Gamemanger_B(object):
         if not roomid in self.rooms:
             return 2, 'roomid wuxiao'
         elif len(self.rooms[roomid].players) == self.rooms[roomid].maxplayer:
-            return 1, 'player full'
+            return 1, roomid
         else:
             return 0, roomid
 
