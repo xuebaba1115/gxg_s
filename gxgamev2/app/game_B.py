@@ -205,6 +205,7 @@ class mjroom(object):
                 print 'nowout_qai  ', p.handcard
                 p.handcard[j] = p.handcard[j] - 1
                 print 'nowout_hou  ', p.handcard
+                self.broadcast({"command":"other","c_action":"outcard","onlyone":p.onlyone,"indexcard":j},[p.pid])
                 continue
             r_action, pp = self.result_computer(p, j, pre_p)
             if r_action:
