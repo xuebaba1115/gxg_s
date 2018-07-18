@@ -327,8 +327,8 @@ class mjroom(object):
         p.cache_data=None            
         self.cache_send = None
         self.chicard = None
-        self.broadcast(
-            {"command": "other_chi", "pinfo": p.pinfo(), "indexcard": j}, passpid=[p.pid])        
+        self.broadcast({"command":"other","c_action":action,"onlyone":p.onlyone,"indexcard":j},passpid=[p.pid])
+     
 
     def _nextoutcard(self, pre):
         c = pre % self.maxplayer + 1
