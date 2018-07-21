@@ -339,6 +339,7 @@ class mjroom(object):
                     i = self.cards.pop(random.randint(0, len(self.cards) - 1))
                     p.conn.sendMessage(json.dumps(
                         {"command": "getcard", "pinfo": p.pinfo(), "getcard": i}))
+                    self.broadcast({"command":"other","c_action":"getcard","onlyone":p.onlyone,"indexcard":j},[p.pid])                          
                     print 'nextcardend ', p.handcard
                     jieguo, _ = self.result_computer(p, i, p.onlyone)
                     if jieguo:
