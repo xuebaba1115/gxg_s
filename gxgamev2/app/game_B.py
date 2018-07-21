@@ -338,10 +338,11 @@ class mjroom(object):
                 try:
                     i = self.cards.pop(random.randint(0, len(self.cards) - 1))
                     p.conn.sendMessage(json.dumps(
-                        {"command": "getcard", "pinfo": p.pinfo(), "getcard": i}))
-                    self.broadcast({"command":"other","c_action":"getcard","onlyone":p.onlyone,"indexcard":j},[p.pid])                          
-                    print 'nextcardend ', p.handcard
+                        {"command": "getcard", "pinfo": p.pinfo(), "getcard": i}))                                               
+                    print 'nextcardend ',p.handcard
+                    self.broadcast({"command":"other","c_action":"getcard","onlyone":p.onlyone,"indexcard":i},[p.pid])
                     jieguo, _ = self.result_computer(p, i, p.onlyone)
+                    print jieguo
                     if jieguo:
                         if "angang" in jieguo or "+gang" in jieguo or "hu" in jieguo:
                             print '##zhimo##', jieguo
@@ -349,7 +350,7 @@ class mjroom(object):
                                 {"command": "gpch", "c_action": jieguo, "indexcard": i, "ppre": p.onlyone}))
                             return
                     p.handcard[i] = p.handcard[i] + 1
-                    print 'nextcardend ', p.handcard
+                    print 'nextcardend', p.handcard
                 except IndexError as e:
                     raise Exception(2)
                 except ValueError as e:
